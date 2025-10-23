@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive Vocabulary Learner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0"
+  }
+}
+</script>
+</head>
+  <body class="bg-rose-50 text-gray-800 antialiased">
+    <div id="root"></div>
+    <script type="module">
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import ReactDOM from 'react-dom/client';
+
+// --- Data from services/vocabulary.ts ---
+const vocabularyData = [
+  {
+    title: "PEOPLE & APPEARANCE",
+    words: [
+      { english: "people", vietnamese: "con người" }, { english: "person", vietnamese: "người" },
+      { english: "friend", vietnamese: "bạn bè" }, { english: "classmate", vietnamese: "bạn cùng lớp" },
+      { english: "neighbor", vietnamese: "hàng xóm" }, { english: "family", vietnamese: "gia đình" },
+      { english: "father", vietnamese: "cha" }, { english: "mother", vietnamese: "mẹ" },
+      { english: "brother", vietnamese: "anh trai, em trai" }, { english: "sister", vietnamese: "chị gái, em gái" },
+      { english: "cousin", vietnamese: "anh/chị/em họ" }, { english: "teacher", vietnamese: "giáo viên" },
+      { english: "student", vietnamese: "học sinh" }, { english: "nurse", vietnamese: "y tá" },
+      { english: "doctor", vietnamese: "bác sĩ" }, { english: "dentist", vietnamese: "nha sĩ" },
+      { english: "coach", vietnamese: "huấn luyện viên" }, { english: "team", vietnamese: "đội, nhóm" },
+      { english: "player", vietnamese: "người chơi" }, { english: "pen friend", vietnamese: "bạn qua thư" },
+      { english: "yourself", vietnamese: "bản thân bạn" }, { english: "myself", vietnamese: "bản thân tôi" },
+      { english: "himself", vietnamese: "bản thân anh ấy" }, { english: "herself", vietnamese: "bản thân cô ấy" },
+      { english: "themselves", vietnamese: "bản thân họ" }, { english: "appearance", vietnamese: "ngoại hình" },
+      { english: "tall", vietnamese: "cao" }, { english: "short", vietnamese: "thấp" },
+      { english: "slim", vietnamese: "mảnh khảnh" }, { english: "fat", vietnamese: "béo" },
+      { english: "beautiful", vietnamese: "đẹp" }, { english: "handsome", vietnamese: "đẹp trai" },
+      { english: "good-looking", vietnamese: "ưa nhìn" }, { english: "young", vietnamese: "trẻ" },
+      { english: "old", vietnamese: "già" }, { english: "dark hair", vietnamese: "tóc đen" },
+      { english: "fair hair", vietnamese: "tóc sáng màu" }, { english: "straight hair", vietnamese: "tóc thẳng" },
+      { english: "curly hair", vietnamese: "tóc xoăn" }, { english: "short hair", vietnamese: "tóc ngắn" },
+      { english: "long hair", vietnamese: "tóc dài" }, { english: "wear glasses", vietnamese: "đeo kính" },
+      { english: "eyes", vietnamese: "đôi mắt" }, { english: "face", vietnamese: "khuôn mặt" },
+      { english: "smile", vietnamese: "nụ cười" }, { english: "skin", vietnamese: "làn da" },
+      { english: "look", vietnamese: "trông có vẻ" }, { english: "seem", vietnamese: "có vẻ như" },
+      { english: "feel", vietnamese: "cảm thấy" }, { english: "kind", vietnamese: "tốt bụng" },
+      { english: "friendly", vietnamese: "thân thiện" }, { english: "generous", vietnamese: "hào phóng" },
+      { english: "helpful", vietnamese: "hay giúp đỡ" }, { english: "honest", vietnamese: "trung thực" },
+      { english: "funny", vietnamese: "vui tính" }, { english: "quiet", vietnamese: "trầm lặng" },
+      { english: "noisy", vietnamese: "ồn ào" }, { english: "shy", vietnamese: "ngại ngùng" },
+      { english: "confident", vietnamese: "tự tin" }, { english: "clever", vietnamese: "thông minh" },
+      { english: "patient", vietnamese: "kiên nhẫn" }, { english: "lazy", vietnamese: "lười biếng" },
+      { english: "hard-working", vietnamese: "chăm chỉ" }, { english: "polite", vietnamese: "lịch sự" },
+      { english: "impolite", vietnamese: "bất lịch sự" }, { english: "tidy", vietnamese: "gọn gàng" },
+      { english: "messy", vietnamese: "bừa bộn" }, { english: "creative", vietnamese: "sáng tạo" },
+      { english: "boring", vietnamese: "nhàm chán" }, { english: "interested in", vietnamese: "quan tâm đến" },
+      { english: "active", vietnamese: "năng động" }, { english: "calm", vietnamese: "điềm tĩnh" },
+      { english: "scared", vietnamese: "sợ hãi" }, { english: "excited", vietnamese: "háo hức" },
+      { english: "worried", vietnamese: "lo lắng" }, { english: "surprised", vietnamese: "ngạc nhiên" },
+      { english: "angry", vietnamese: "tức giận" }, { english: "tired", vietnamese: "mệt mỏi" },
+      { english: "relaxed", vietnamese: "thư giãn" }, { english: "happy", vietnamese: "vui vẻ" },
+      { english: "sad", vietnamese: "buồn" }, { english: "laugh", vietnamese: "cười lớn" },
+      { english: "cry", vietnamese: "khóc" }, { english: "feel nervous", vietnamese: "cảm thấy lo lắng" },
+      { english: "feel confident", vietnamese: "cảm thấy tự tin" }, { english: "describe", vietnamese: "miêu tả" },
+      { english: "personality", vietnamese: "tính cách" }, { english: "character", vietnamese: "đặc điểm (con người)" },
+      { english: "opinion", vietnamese: "ý kiến" }, { english: "think", vietnamese: "nghĩ" },
+      { english: "agree", vietnamese: "đồng ý" }, { english: "disagree", vietnamese: "không đồng ý" },
+      { english: "prefer", vietnamese: "thích hơn" }, { english: "would rather", vietnamese: "thà rằng, muốn hơn" },
+    ],
+  },
+  {
+    title: "SCHOOL & LEARNING",
+    words: [
+      { english: "school", vietnamese: "trường học" }, { english: "classroom", vietnamese: "phòng học" },
+      { english: "class", vietnamese: "lớp học" }, { english: "student", vietnamese: "học sinh" },
+      { english: "pupil", vietnamese: "học sinh (Anh Anh)" }, { english: "teacher", vietnamese: "giáo viên" },
+      { english: "subject", vietnamese: "môn học" }, { english: "timetable", vietnamese: "thời khóa biểu" },
+      { english: "lesson", vietnamese: "bài học" }, { english: "homework", vietnamese: "bài tập về nhà" },
+      { english: "test", vietnamese: "bài kiểm tra" }, { english: "exam", vietnamese: "kỳ thi" },
+      { english: "mark", vietnamese: "điểm số" }, { english: "grade", vietnamese: "xếp loại" },
+      { english: "result", vietnamese: "kết quả" }, { english: "study", vietnamese: "học tập" },
+      { english: "learn", vietnamese: "học" }, { english: "education", vietnamese: "giáo dục" },
+      { english: "revise", vietnamese: "ôn tập" }, { english: "practice", vietnamese: "luyện tập" },
+      { english: "question", vietnamese: "câu hỏi" }, { english: "answer", vietnamese: "câu trả lời" },
+      { english: "mistake", vietnamese: "lỗi sai" }, { english: "correct", vietnamese: "sửa đúng" },
+      { english: "write", vietnamese: "viết" }, { english: "read", vietnamese: "đọc" },
+      { english: "listen", vietnamese: "nghe" }, { english: "speak", vietnamese: "nói" },
+      { english: "say", vietnamese: "nói (một điều gì đó)" }, { english: "tell", vietnamese: "kể (cho ai nghe)" },
+      { english: "understand", vietnamese: "hiểu" }, { english: "explain", vietnamese: "giải thích" },
+      { english: "describe", vietnamese: "miêu tả" }, { english: "remember", vietnamese: "ghi nhớ" },
+      { english: "forget", vietnamese: "quên" }, { english: "know", vietnamese: "biết" },
+      { english: "check", vietnamese: "kiểm tra" }, { english: "underline", vietnamese: "gạch dưới" },
+      { english: "circle", vietnamese: "khoanh tròn" }, { english: "fill in", vietnamese: "điền vào" },
+      { english: "rearrange", vietnamese: "sắp xếp lại" }, { english: "choose", vietnamese: "chọn" },
+      { english: "complete", vietnamese: "hoàn thành" }, { english: "match", vietnamese: "nối, ghép" },
+      { english: "find", vietnamese: "tìm" }, { english: "compare", vietnamese: "so sánh" },
+      { english: "translate", vietnamese: "dịch" }, { english: "example", vietnamese: "ví dụ" },
+      { english: "question word", vietnamese: "từ để hỏi" }, { english: "who", vietnamese: "ai" },
+      { english: "what", vietnamese: "cái gì" }, { english: "where", vietnamese: "ở đâu" },
+      { english: "when", vietnamese: "khi nào" }, { english: "why", vietnamese: "tại sao" },
+      { english: "how", vietnamese: "như thế nào" }, { english: "how many", vietnamese: "bao nhiêu (đếm được)" },
+      { english: "how much", vietnamese: "bao nhiêu (không đếm được)" }, { english: "how often", vietnamese: "bao lâu một lần" },
+      { english: "how long", vietnamese: "bao lâu" }, { english: "how far", vietnamese: "bao xa" },
+      { english: "whose", vietnamese: "của ai" }, { english: "which", vietnamese: "cái nào" },
+      { english: "write a paragraph", vietnamese: "viết đoạn văn" }, { english: "topic", vietnamese: "chủ đề" },
+      { english: "main idea", vietnamese: "ý chính" }, { english: "detail", vietnamese: "chi tiết" },
+      { english: "paragraph", vietnamese: "đoạn văn" }, { english: "passage", vietnamese: "đoạn đọc" },
+      { english: "reading skill", vietnamese: "kỹ năng đọc" }, { english: "listening skill", vietnamese: "kỹ năng nghe" },
+      { english: "writing skill", vietnamese: "kỹ năng viết" }, { english: "speaking skill", vietnamese: "kỹ năng nói" },
+      { english: "grammar", vietnamese: "ngữ pháp" }, { english: "vocabulary", vietnamese: "từ vựng" },
+      { english: "pronunciation", vietnamese: "phát âm" }, { english: "stress", vietnamese: "trọng âm" },
+      { english: "intonation", vietnamese: "ngữ điệu" }, { english: "sentence", vietnamese: "câu" },
+      { english: "phrase", vietnamese: "cụm từ" }, { english: "clause", vietnamese: "mệnh đề" },
+      { english: "noun", vietnamese: "danh từ" }, { english: "verb", vietnamese: "động từ" },
+      { english: "adjective", vietnamese: "tính từ" }, { english: "adverb", vietnamese: "trạng từ" },
+      { english: "preposition", vietnamese: "giới từ" }, { english: "conjunction", vietnamese: "liên từ" },
+      { english: "article", vietnamese: "mạo từ" }, { english: "tense", vietnamese: "thì" },
+      { english: "present simple", vietnamese: "thì hiện tại đơn" }, { english: "present continuous", vietnamese: "thì hiện tại tiếp diễn" },
+      { english: "past simple", vietnamese: "thì quá khứ đơn" }, { english: "future simple", vietnamese: "thì tương lai đơn" },
+      { english: "modal verb", vietnamese: "động từ khuyết thiếu" }, { english: "can", vietnamese: "có thể" },
+      { english: "could", vietnamese: "có thể (lịch sự/quá khứ)" }, { english: "may", vietnamese: "có thể" },
+      { english: "might", vietnamese: "có thể (ít chắc chắn)" }, { english: "must", vietnamese: "phải" },
+      { english: "should", vietnamese: "nên" }, { english: "shouldn't", vietnamese: "không nên" },
+      { english: "have to", vietnamese: "phải" }, { english: "need to", vietnamese: "cần phải" },
+      { english: "ought to", vietnamese: "nên (trang trọng)" }, { english: "would", vietnamese: "sẽ (giả định)" },
+      { english: "will", vietnamese: "sẽ" }, { english: "let's", vietnamese: "hãy cùng" },
+      { english: "why don't we", vietnamese: "tại sao chúng ta không" }, { english: "report", vietnamese: "báo cáo" },
+      { english: "presentation", vietnamese: "bài thuyết trình" }, { english: "discussion", vietnamese: "cuộc thảo luận" },
+      { english: "group", vietnamese: "nhóm" }, { english: "pair work", vietnamese: "làm việc theo cặp" },
+      { english: "project", vietnamese: "dự án" }, { english: "homework notebook", vietnamese: "vở bài tập về nhà" },
+      { english: "school bag", vietnamese: "cặp đi học" }, { english: "uniform", vietnamese: "đồng phục" },
+      { english: "break time", vietnamese: "giờ ra chơi" }, { english: "playtime", vietnamese: "giờ chơi (Anh Anh)" },
+      { english: "playground", vietnamese: "sân chơi" }, { english: "library", vietnamese: "thư viện" },
+      { english: "head teacher", vietnamese: "hiệu trưởng" }, { english: "school gate", vietnamese: "cổng trường" },
+      { english: "rule", vietnamese: "nội quy" }, { english: "follow the rules", vietnamese: "tuân theo quy định" },
+      { english: "break the rules", vietnamese: "vi phạm nội quy" }, { english: "competition", vietnamese: "cuộc thi" },
+      { english: "prize", vietnamese: "phần thưởng" }, { english: "certificate", vietnamese: "giấy chứng nhận" },
+      { english: "effort", vietnamese: "nỗ lực" }, { english: "improve", vietnamese: "cải thiện" },
+      { english: "develop", vietnamese: "phát triển" }, { english: "achieve", vietnamese: "đạt được" },
+      { english: "goal", vietnamese: "mục tiêu" }, { english: "succeed", vietnamese: "thành công" },
+      { english: "success", vietnamese: "sự thành công" }, { english: "failure", vietnamese: "thất bại" },
+      { english: "try", vietnamese: "cố gắng" }, { english: "pay attention", vietnamese: "chú ý" },
+      { english: "share ideas", vietnamese: "chia sẻ ý tưởng" }, { english: "help each other", vietnamese: "giúp đỡ nhau" },
+      { english: "take part in", vietnamese: "tham gia vào" }, { english: "participate in", vietnamese: "tham gia" },
+      { english: "volunteer", vietnamese: "tình nguyện" }, { english: "spend time", vietnamese: "dành thời gian" },
+      { english: "discuss", vietnamese: "thảo luận" }, { english: "prepare", vietnamese: "chuẩn bị" },
+      { english: "plan", vietnamese: "kế hoạch" }, { english: "schedule", vietnamese: "lịch trình" },
+      { english: "subject list", vietnamese: "danh sách môn học" }, { english: "mathematics", vietnamese: "toán học" },
+      { english: "English", vietnamese: "tiếng Anh" }, { english: "history", vietnamese: "lịch sử" },
+      { english: "geography", vietnamese: "địa lý" }, { english: "science", vietnamese: "khoa học" },
+      { english: "biology", vietnamese: "sinh học" }, { english: "physics", vietnamese: "vật lý" },
+      { english: "chemistry", vietnamese: "hóa học" }, { english: "art", vietnamese: "mỹ thuật" },
+      { english: "music", vietnamese: "âm nhạc" }, { english: "information technology (IT)", vietnamese: "tin học" },
+      { english: "physical education (PE)", vietnamese: "thể dục" }, { english: "literature", vietnamese: "ngữ văn" },
+      { english: "civics", vietnamese: "giáo dục công dân" },
+    ]
+  },
+  {
+    title: "FREE TIME & HOBBIES",
+    words: [
+        { english: "free time", vietnamese: "thời gian rảnh" }, { english: "leisure activity", vietnamese: "hoạt động giải trí" },
+        { english: "hobby", vietnamese: "sở thích" }, { english: "interest", vietnamese: "sự quan tâm, điều yêu thích" },
+        { english: "enjoy", vietnamese: "thích, tận hưởng" }, { english: "love", vietnamese: "yêu thích" },
+        { english: "like", vietnamese: "thích" }, { english: "dislike", vietnamese: "không thích" },
+        { english: "hate", vietnamese: "ghét" }, { english: "prefer", vietnamese: "thích hơn" },
+        { english: "would rather", vietnamese: "thà rằng, muốn hơn" }, { english: "be interested in", vietnamese: "quan tâm đến" },
+        { english: "spend time", vietnamese: "dành thời gian" }, { english: "in my free time", vietnamese: "vào thời gian rảnh" },
+        { english: "play sports", vietnamese: "chơi thể thao" }, { english: "play football", vietnamese: "chơi bóng đá" },
+        { english: "play badminton", vietnamese: "chơi cầu lông" }, { english: "play volleyball", vietnamese: "chơi bóng chuyền" },
+        { english: "play table tennis", vietnamese: "chơi bóng bàn" }, { english: "play the guitar", vietnamese: "chơi đàn guitar" },
+        { english: "play the piano", vietnamese: "chơi đàn piano" }, { english: "go swimming", vietnamese: "đi bơi" },
+        { english: "go fishing", vietnamese: "đi câu cá" }, { english: "go camping", vietnamese: "đi cắm trại" },
+        { english: "go cycling", vietnamese: "đi đạp xe" }, { english: "go jogging", vietnamese: "đi/chạy bộ" },
+        { english: "go hiking", vietnamese: "đi bộ đường dài" }, { english: "go shopping", vietnamese: "đi mua sắm" },
+        { english: "go out", vietnamese: "đi ra ngoài" }, { english: "go on a picnic", vietnamese: "đi dã ngoại" },
+        { english: "watch TV", vietnamese: "xem tivi" }, { english: "watch cartoons", vietnamese: "xem phim hoạt hình" },
+        { english: "watch a film", vietnamese: "xem phim" }, { english: "watch sports", vietnamese: "xem thể thao" },
+        { english: "listen to music", vietnamese: "nghe nhạc" }, { english: "play games", vietnamese: "chơi trò chơi" },
+        { english: "computer games", vietnamese: "trò chơi trên máy tính" }, { english: "online games", vietnamese: "trò chơi trực tuyến" },
+        { english: "chat online", vietnamese: "trò chuyện trực tuyến" }, { english: "surf the Internet", vietnamese: "lướt mạng" },
+        { english: "use the Internet", vietnamese: "sử dụng Internet" }, { english: "watch videos", vietnamese: "xem video" },
+        { english: "make videos", vietnamese: "làm video" }, { english: "take photos", vietnamese: "chụp ảnh" },
+        { english: "photography", vietnamese: "nhiếp ảnh" }, { english: "collect stamps", vietnamese: "sưu tầm tem" },
+        { english: "collect coins", vietnamese: "sưu tầm tiền xu" }, { english: "collect books", vietnamese: "sưu tầm sách" },
+        { english: "collect comics", vietnamese: "sưu tầm truyện tranh" }, { english: "read books", vietnamese: "đọc sách" },
+        { english: "read comics", vietnamese: "đọc truyện tranh" }, { english: "read magazines", vietnamese: "đọc tạp chí" },
+        { english: "write stories", vietnamese: "viết truyện" }, { english: "draw pictures", vietnamese: "vẽ tranh" },
+        { english: "paint", vietnamese: "sơn, vẽ" }, { english: "do gardening", vietnamese: "làm vườn" },
+        { english: "grow plants", vietnamese: "trồng cây" }, { english: "cook", vietnamese: "nấu ăn" },
+        { english: "bake cakes", vietnamese: "nướng bánh" }, { english: "help parents", vietnamese: "giúp bố mẹ" },
+        { english: "do homework", vietnamese: "làm bài tập" }, { english: "play with pets", vietnamese: "chơi với thú cưng" },
+        { english: "volunteer", vietnamese: "làm tình nguyện" }, { english: "take part in", vietnamese: "tham gia vào" },
+        { english: "participate in", vietnamese: "tham gia" }, { english: "join a club", vietnamese: "tham gia câu lạc bộ" },
+        { english: "join a sport club", vietnamese: "tham gia câu lạc bộ thể thao" }, { english: "join an art club", vietnamese: "tham gia câu lạc bộ nghệ thuật" },
+        { english: "hang out with friends", vietnamese: "đi chơi với bạn" }, { english: "meet friends", vietnamese: "gặp bạn bè" },
+        { english: "chat with friends", vietnamese: "nói chuyện với bạn" }, { english: "go to the cinema", vietnamese: "đi xem phim" },
+        { english: "go to the park", vietnamese: "đi công viên" }, { english: "go to a café", vietnamese: "đi quán cà phê" },
+        { english: "go to a concert", vietnamese: "đi buổi hòa nhạc" }, { english: "go to the museum", vietnamese: "đi viện bảo tàng" },
+        { english: "go to the art gallery", vietnamese: "đi phòng trưng bày nghệ thuật" }, { english: "art", vietnamese: "nghệ thuật" },
+        { english: "artist", vietnamese: "nghệ sĩ" }, { english: "work of art", vietnamese: "tác phẩm nghệ thuật" },
+        { english: "creative", vietnamese: "sáng tạo" }, { english: "activity", vietnamese: "hoạt động" },
+        { english: "fun", vietnamese: "vui vẻ" }, { english: "exciting", vietnamese: "thú vị, gây hứng thú" },
+        { english: "relaxing", vietnamese: "thư giãn" }, { english: "interesting", vietnamese: "thú vị" },
+        { english: "boring", vietnamese: "nhàm chán" }, { english: "tired", vietnamese: "mệt" },
+        { english: "energetic", vietnamese: "tràn đầy năng lượng" }, { english: "outdoor activity", vietnamese: "hoạt động ngoài trời" },
+        { english: "indoor activity", vietnamese: "hoạt động trong nhà" }, { english: "travel", vietnamese: "du lịch" },
+        { english: "trip", vietnamese: "chuyến đi" }, { english: "picnic", vietnamese: "chuyến dã ngoại" },
+        { english: "camp", vietnamese: "trại" }, { english: "camping", vietnamese: "việc cắm trại" },
+        { english: "adventure", vietnamese: "cuộc phiêu lưu" }, { english: "experience", vietnamese: "trải nghiệm" },
+        { english: "photo", vietnamese: "bức ảnh" }, { english: "camera", vietnamese: "máy ảnh" },
+        { english: "video", vietnamese: "video" }, { english: "channel", vietnamese: "kênh (TV, YouTube)" },
+        { english: "post", vietnamese: "đăng bài" }, { english: "share", vietnamese: "chia sẻ" },
+        { english: "comment", vietnamese: "bình luận" }, { english: "upload", vietnamese: "tải lên" },
+        { english: "download", vietnamese: "tải xuống" }, { english: "online", vietnamese: "trực tuyến" },
+        { english: "offline", vietnamese: "ngoại tuyến" }, { english: "app", vietnamese: "ứng dụng" },
+        { english: "social media", vietnamese: "mạng xã hội" }, { english: "website", vietnamese: "trang web" },
+        { english: "username", vietnamese: "tên người dùng" }, { english: "password", vietnamese: "mật khẩu" },
+        { english: "safe", vietnamese: "an toàn" }, { english: "dangerous", vietnamese: "nguy hiểm" },
+        { english: "rule", vietnamese: "quy tắc" }, { english: "follow the rules", vietnamese: "tuân thủ quy định" },
+        { english: "break the rules", vietnamese: "vi phạm quy tắc" }, { english: "together", vietnamese: "cùng nhau" },
+        { english: "alone", vietnamese: "một mình" }, { english: "abroad", vietnamese: "ở nước ngoài" },
+        { english: "during the holiday", vietnamese: "trong kỳ nghỉ" }, { english: "on holiday", vietnamese: "đang đi nghỉ" },
+        { english: "weekend", vietnamese: "cuối tuần" }, { english: "at the weekend", vietnamese: "vào cuối tuần" },
+        { english: "in the morning", vietnamese: "buổi sáng" }, { english: "in the afternoon", vietnamese: "buổi chiều" },
+        { english: "in the evening", vietnamese: "buổi tối" }, { english: "at night", vietnamese: "ban đêm" },
+    ]
+  },
+  {
+    title: "HEALTH & BODY",
+    words: [
+        { english: "health", vietnamese: "sức khỏe" }, { english: "healthy", vietnamese: "khỏe mạnh" },
+        { english: "unhealthy", vietnamese: "không khỏe mạnh" }, { english: "fit", vietnamese: "cân đối, khỏe mạnh" },
+        { english: "fitness", vietnamese: "thể lực" }, { english: "exercise", vietnamese: "bài tập thể dục" },
+        { english: "do exercise", vietnamese: "tập thể dục" }, { english: "do yoga", vietnamese: "tập yoga" },
+        { english: "go jogging", vietnamese: "chạy bộ" }, { english: "go cycling", vietnamese: "đạp xe" },
+        { english: "play sports", vietnamese: "chơi thể thao" }, { english: "take a walk", vietnamese: "đi dạo" },
+        { english: "physical activity", vietnamese: "hoạt động thể chất" }, { english: "stay in shape", vietnamese: "giữ dáng" },
+        { english: "keep fit", vietnamese: "giữ cơ thể khỏe mạnh" }, { english: "training", vietnamese: "luyện tập" },
+        { english: "warm up", vietnamese: "khởi động" }, { english: "cool down", vietnamese: "thả lỏng sau khi tập" },
+        { english: "practice", vietnamese: "luyện tập" }, { english: "rest", vietnamese: "nghỉ ngơi" },
+        { english: "sleep", vietnamese: "giấc ngủ" }, { english: "go to bed", vietnamese: "đi ngủ" },
+        { english: "get up early", vietnamese: "dậy sớm" }, { english: "stay up late", vietnamese: "thức khuya" },
+        { english: "tired", vietnamese: "mệt mỏi" }, { english: "sleepy", vietnamese: "buồn ngủ" },
+        { english: "stress", vietnamese: "căng thẳng" }, { english: "stressed", vietnamese: "bị căng thẳng" },
+        { english: "feel tired", vietnamese: "cảm thấy mệt" }, { english: "feel sick", vietnamese: "cảm thấy ốm" },
+        { english: "feel well", vietnamese: "cảm thấy khỏe" }, { english: "feel better", vietnamese: "cảm thấy tốt hơn" },
+        { english: "weak", vietnamese: "yếu" }, { english: "strong", vietnamese: "mạnh" },
+        { english: "body", vietnamese: "cơ thể" }, { english: "head", vietnamese: "đầu" }, { english: "hair", vietnamese: "tóc" },
+        { english: "eye", vietnamese: "mắt" }, { english: "ear", vietnamese: "tai" }, { english: "nose", vietnamese: "mũi" },
+        { english: "mouth", vietnamese: "miệng" }, { english: "tooth", vietnamese: "răng" }, { english: "teeth", vietnamese: "răng (số nhiều)" },
+        { english: "face", vietnamese: "khuôn mặt" }, { english: "neck", vietnamese: "cổ" }, { english: "shoulder", vietnamese: "vai" },
+        { english: "arm", vietnamese: "cánh tay" }, { english: "hand", vietnamese: "bàn tay" }, { english: "finger", vietnamese: "ngón tay" },
+        { english: "leg", vietnamese: "chân" }, { english: "foot", vietnamese: "bàn chân" }, { english: "feet", vietnamese: "bàn chân (số nhiều)" },
+        { english: "stomach", vietnamese: "dạ dày" }, { english: "heart", vietnamese: "tim" }, { english: "skin", vietnamese: "da" },
+        { english: "brain", vietnamese: "não" }, { english: "blood", vietnamese: "máu" }, { english: "bone", vietnamese: "xương" },
+        { english: "muscle", vietnamese: "cơ bắp" }, { english: "lung", vietnamese: "phổi" }, { english: "disease", vietnamese: "bệnh tật" },
+        { english: "illness", vietnamese: "căn bệnh" }, { english: "symptom", vietnamese: "triệu chứng" },
+        { english: "pain", vietnamese: "cơn đau" }, { english: "ache", vietnamese: "đau nhức" }, { english: "headache", vietnamese: "đau đầu" },
+        { english: "toothache", vietnamese: "đau răng" }, { english: "stomachache", vietnamese: "đau bụng" },
+        { english: "backache", vietnamese: "đau lưng" }, { english: "earache", vietnamese: "đau tai" },
+        { english: "sore throat", vietnamese: "đau họng" }, { english: "cough", vietnamese: "ho" }, { english: "fever", vietnamese: "sốt" },
+        { english: "flu", vietnamese: "cảm cúm" }, { english: "cold", vietnamese: "cảm lạnh" }, { english: "allergy", vietnamese: "dị ứng" },
+        { english: "feel dizzy", vietnamese: "chóng mặt" }, { english: "have a runny nose", vietnamese: "sổ mũi" },
+        { english: "have a temperature", vietnamese: "bị sốt" }, { english: "be hurt", vietnamese: "bị thương" },
+        { english: "get injured", vietnamese: "bị chấn thương" }, { english: "get well soon", vietnamese: "mau khỏe nhé" },
+        { english: "take medicine", vietnamese: "uống thuốc" }, { english: "take a rest", vietnamese: "nghỉ ngơi" },
+        { english: "take care", vietnamese: "chăm sóc bản thân" }, { english: "stay healthy", vietnamese: "giữ sức khỏe" },
+        { english: "eat healthy food", vietnamese: "ăn thức ăn lành mạnh" }, { english: "junk food", vietnamese: "đồ ăn vặt không tốt" },
+        { english: "fast food", vietnamese: "đồ ăn nhanh" }, { english: "balanced diet", vietnamese: "chế độ ăn cân bằng" },
+        { english: "food pyramid", vietnamese: "tháp dinh dưỡng" }, { english: "meal", vietnamese: "bữa ăn" },
+        { english: "breakfast", vietnamese: "bữa sáng" }, { english: "lunch", vietnamese: "bữa trưa" },
+        { english: "dinner", vietnamese: "bữa tối" }, { english: "snack", vietnamese: "bữa ăn nhẹ" },
+        { english: "drink water", vietnamese: "uống nước" }, { english: "soft drink", vietnamese: "nước ngọt" },
+        { english: "milk", vietnamese: "sữa" }, { english: "juice", vietnamese: "nước ép" }, { english: "fruit", vietnamese: "trái cây" },
+        { english: "vegetable", vietnamese: "rau củ" }, { english: "banana", vietnamese: "chuối" }, { english: "carrot", vietnamese: "cà rốt" },
+        { english: "meat", vietnamese: "thịt" }, { english: "chicken", vietnamese: "thịt gà" }, { english: "fish", vietnamese: "cá" },
+        { english: "egg", vietnamese: "trứng" }, { english: "rice", vietnamese: "cơm" }, { english: "bread", vietnamese: "bánh mì" },
+        { english: "sugar", vietnamese: "đường" }, { english: "salt", vietnamese: "muối" }, { english: "oil", vietnamese: "dầu ăn" },
+        { english: "fat", vietnamese: "chất béo" }, { english: "protein", vietnamese: "chất đạm" }, { english: "vitamin", vietnamese: "vitamin" },
+        { english: "mineral", vietnamese: "khoáng chất" }, { english: "calorie", vietnamese: "năng lượng (calo)" },
+        { english: "too much", vietnamese: "quá nhiều" }, { english: "enough", vietnamese: "đủ" },
+        { english: "drink enough water", vietnamese: "uống đủ nước" }, { english: "sleep well", vietnamese: "ngủ ngon" },
+        { english: "brush teeth", vietnamese: "đánh răng" }, { english: "wash hands", vietnamese: "rửa tay" },
+        { english: "take a shower", vietnamese: "tắm" }, { english: "clean", vietnamese: "sạch sẽ" },
+        { english: "dirty", vietnamese: "bẩn" }, { english: "doctor", vietnamese: "bác sĩ" }, { english: "nurse", vietnamese: "y tá" },
+        { english: "dentist", vietnamese: "nha sĩ" }, { english: "patient", vietnamese: "bệnh nhân" },
+        { english: "hospital", vietnamese: "bệnh viện" }, { english: "clinic", vietnamese: "phòng khám" },
+        { english: "appointment", vietnamese: "cuộc hẹn (với bác sĩ)" }, { english: "check-up", vietnamese: "kiểm tra sức khỏe" },
+        { english: "health problem", vietnamese: "vấn đề sức khỏe" }, { english: "advice", vietnamese: "lời khuyên" },
+        { english: "should", vietnamese: "nên" }, { english: "shouldn't", vietnamese: "không nên" },
+        { english: "must", vietnamese: "phải" }, { english: "need to", vietnamese: "cần phải" }, { english: "try to", vietnamese: "cố gắng" },
+        { english: "want to be healthy", vietnamese: "muốn khỏe mạnh" }, { english: "take part in sports", vietnamese: "tham gia thể thao" },
+        { english: "spend time outdoors", vietnamese: "dành thời gian ngoài trời" }, { english: "avoid junk food", vietnamese: "tránh đồ ăn vặt" },
+        { english: "limit screen time", vietnamese: "hạn chế thời gian dùng màn hình" }, { english: "keep clean", vietnamese: "giữ sạch" },
+        { english: "wash regularly", vietnamese: "rửa thường xuyên" }, { english: "follow the doctor's advice", vietnamese: "làm theo lời khuyên của bác sĩ" },
+        { english: "safety", vietnamese: "an toàn" }, { english: "dangerous", vietnamese: "nguy hiểm" },
+        { english: "accident", vietnamese: "tai nạn" }, { english: "first aid", vietnamese: "sơ cứu" },
+        { english: "emergency", vietnamese: "tình huống khẩn cấp" },
+    ]
+  },
+  {
+    title: "FOOD & DRINKS",
+    words: [
+      { english: "food", vietnamese: "thức ăn" }, { english: "drink", vietnamese: "đồ uống" }, { english: "meal", vietnamese: "bữa ăn" },
+      { english: "breakfast", vietnamese: "bữa sáng" }, { english: "lunch", vietnamese: "bữa trưa" }, { english: "dinner", vietnamese: "bữa tối" },
+      { english: "snack", vietnamese: "đồ ăn nhẹ" }, { english: "fast food", vietnamese: "đồ ăn nhanh" },
+      { english: "junk food", vietnamese: "đồ ăn vặt không tốt" }, { english: "healthy food", vietnamese: "thực phẩm lành mạnh" },
+      { english: "unhealthy food", vietnamese: "thực phẩm không tốt cho sức khỏe" }, { english: "balanced diet", vietnamese: "chế độ ăn cân bằng" },
+      { english: "food pyramid", vietnamese: "tháp dinh dưỡng" }, { english: "nutrition", vietnamese: "dinh dưỡng" },
+      { english: "nutrient", vietnamese: "chất dinh dưỡng" }, { english: "calorie", vietnamese: "năng lượng (calo)" },
+      { english: "fat", vietnamese: "chất béo" }, { english: "sugar", vietnamese: "đường" }, { english: "salt", vietnamese: "muối" },
+      { english: "oil", vietnamese: "dầu ăn" }, { english: "protein", vietnamese: "chất đạm" }, { english: "vitamin", vietnamese: "vitamin" },
+      { english: "mineral", vietnamese: "khoáng chất" }, { english: "carbohydrate", vietnamese: "tinh bột" },
+      { english: "fibre", vietnamese: "chất xơ" }, { english: "diet", vietnamese: "chế độ ăn" }, { english: "eat", vietnamese: "ăn" },
+      { english: "drink water", vietnamese: "uống nước" }, { english: "have breakfast", vietnamese: "ăn sáng" },
+      { english: "have lunch", vietnamese: "ăn trưa" }, { english: "have dinner", vietnamese: "ăn tối" },
+      { english: "cook", vietnamese: "nấu ăn" }, { english: "taste", vietnamese: "nếm" }, { english: "smell", vietnamese: "ngửi" },
+      { english: "delicious", vietnamese: "ngon" }, { english: "tasty", vietnamese: "ngon miệng" }, { english: "spicy", vietnamese: "cay" },
+      { english: "salty", vietnamese: "mặn" }, { english: "sweet", vietnamese: "ngọt" }, { english: "sour", vietnamese: "chua" },
+      { english: "bitter", vietnamese: "đắng" }, { english: "fresh", vietnamese: "tươi" }, { english: "raw", vietnamese: "sống, chưa nấu chín" },
+      { english: "cooked", vietnamese: "đã nấu chín" }, { english: "hot", vietnamese: "nóng" }, { english: "cold", vietnamese: "lạnh" },
+      { english: "warm", vietnamese: "ấm" }, { english: "hungry", vietnamese: "đói" }, { english: "thirsty", vietnamese: "khát" },
+      { english: "full", vietnamese: "no" }, { english: "favourite food", vietnamese: "món ăn yêu thích" },
+      { english: "favourite drink", vietnamese: "đồ uống yêu thích" }, { english: "fruit", vietnamese: "trái cây" },
+      { english: "apple", vietnamese: "táo" }, { english: "banana", vietnamese: "chuối" }, { english: "orange", vietnamese: "cam" },
+      { english: "mango", vietnamese: "xoài" }, { english: "grape", vietnamese: "nho" }, { english: "watermelon", vietnamese: "dưa hấu" },
+      { english: "pineapple", vietnamese: "dứa" }, { english: "lemon", vietnamese: "chanh" }, { english: "vegetable", vietnamese: "rau củ" },
+      { english: "carrot", vietnamese: "cà rốt" }, { english: "tomato", vietnamese: "cà chua" }, { english: "potato", vietnamese: "khoai tây" },
+      { english: "cabbage", vietnamese: "bắp cải" }, { english: "onion", vietnamese: "hành tây" }, { english: "lettuce", vietnamese: "rau xà lách" },
+      { english: "cucumber", vietnamese: "dưa leo" }, { english: "mushroom", vietnamese: "nấm" }, { english: "bean", vietnamese: "đậu" },
+      { english: "pea", vietnamese: "đậu hà lan" }, { english: "meat", vietnamese: "thịt" }, { english: "pork", vietnamese: "thịt heo" },
+      { english: "beef", vietnamese: "thịt bò" }, { english: "chicken", vietnamese: "thịt gà" }, { english: "fish", vietnamese: "cá" },
+      { english: "egg", vietnamese: "trứng" }, { english: "seafood", vietnamese: "hải sản" }, { english: "rice", vietnamese: "cơm, gạo" },
+      { english: "noodle", vietnamese: "mì" }, { english: "bread", vietnamese: "bánh mì" }, { english: "cheese", vietnamese: "phô mai" },
+      { english: "butter", vietnamese: "bơ" }, { english: "milk", vietnamese: "sữa" }, { english: "yogurt", vietnamese: "sữa chua" },
+      { english: "soup", vietnamese: "súp" }, { english: "sandwich", vietnamese: "bánh sandwich" }, { english: "pizza", vietnamese: "bánh pizza" },
+      { english: "hamburger", vietnamese: "bánh hamburger" }, { english: "salad", vietnamese: "món salad" },
+      { english: "sausage", vietnamese: "xúc xích" }, { english: "cake", vietnamese: "bánh ngọt" },
+      { english: "biscuit", vietnamese: "bánh quy" }, { english: "chocolate", vietnamese: "sô-cô-la" },
+      { english: "ice cream", vietnamese: "kem" }, { english: "sauce", vietnamese: "nước sốt" },
+      { english: "ketchup", vietnamese: "tương cà" }, { english: "pepper", vietnamese: "tiêu" }, { english: "chili", vietnamese: "ớt" },
+      { english: "water", vietnamese: "nước" }, { english: "mineral water", vietnamese: "nước khoáng" },
+      { english: "soft drink", vietnamese: "nước ngọt" }, { english: "soda", vietnamese: "nước có ga" },
+      { english: "juice", vietnamese: "nước ép" }, { english: "orange juice", vietnamese: "nước cam" },
+      { english: "lemon juice", vietnamese: "nước chanh" }, { english: "tea", vietnamese: "trà" },
+      { english: "coffee", vietnamese: "cà phê" }, { english: "hot chocolate", vietnamese: "sô-cô-la nóng" },
+      { english: "canteen", vietnamese: "căng-tin" }, { english: "restaurant", vietnamese: "nhà hàng" },
+      { english: "café", vietnamese: "quán cà phê" }, { english: "chef", vietnamese: "đầu bếp" },
+      { english: "kitchen", vietnamese: "nhà bếp" }, { english: "plate", vietnamese: "cái đĩa" },
+      { english: "bowl", vietnamese: "cái bát" }, { english: "cup", vietnamese: "cái cốc" }, { english: "glass", vietnamese: "ly" },
+      { english: "spoon", vietnamese: "muỗng" }, { english: "fork", vietnamese: "nĩa" }, { english: "knife", vietnamese: "dao" },
+      { english: "napkin", vietnamese: "khăn ăn" }, { english: "dish", vietnamese: "món ăn" }, { english: "menu", vietnamese: "thực đơn" },
+      { english: "order food", vietnamese: "gọi món" }, { english: "bill", vietnamese: "hóa đơn" },
+      { english: "eat out", vietnamese: "ăn ở ngoài" }, { english: "eat at home", vietnamese: "ăn ở nhà" },
+      { english: "go shopping", vietnamese: "đi mua đồ ăn" }, { english: "supermarket", vietnamese: "siêu thị" },
+      { english: "market", vietnamese: "chợ" }, { english: "shop", vietnamese: "cửa hàng" }, { english: "seller", vietnamese: "người bán" },
+      { english: "buyer", vietnamese: "người mua" }, { english: "money", vietnamese: "tiền" }, { english: "price", vietnamese: "giá" },
+      { english: "cheap", vietnamese: "rẻ" }, { english: "expensive", vietnamese: "đắt" }, { english: "choose", vietnamese: "chọn" },
+      { english: "prefer", vietnamese: "thích hơn" }, { english: "try new food", vietnamese: "thử món mới" },
+      { english: "cook for family", vietnamese: "nấu cho gia đình" }, { english: "help parents prepare meals", vietnamese: "giúp bố mẹ chuẩn bị bữa ăn" },
+      { english: "too much sugar", vietnamese: "quá nhiều đường" }, { english: "enough vegetables", vietnamese: "đủ rau củ" },
+      { english: "eat more fruit", vietnamese: "ăn nhiều trái cây hơn" }, { english: "drink less soda", vietnamese: "uống ít nước ngọt hơn" },
+      { english: "eat less junk food", vietnamese: "ăn ít đồ ăn vặt" }, { english: "eat slowly", vietnamese: "ăn chậm" },
+      { english: "eat together", vietnamese: "ăn cùng nhau" }, { english: "wash hands before eating", vietnamese: "rửa tay trước khi ăn" },
+      { english: "don't waste food", vietnamese: "đừng lãng phí thức ăn" }, { english: "stay healthy", vietnamese: "giữ sức khỏe" },
+      { english: "enjoy your meal", vietnamese: "chúc ngon miệng" },
+    ]
+  },
+  {
+    title: "SPORTS & EXERCISE",
+    words: [
+        { english: "sport", vietnamese: "thể thao" }, { english: "sportsman", vietnamese: "vận động viên nam" }, { english: "sportswoman", vietnamese: "vận động viên nữ" },
+        { english: "player", vietnamese: "người chơi" }, { english: "athlete", vietnamese: "vận động viên" }, { english: "coach", vietnamese: "huấn luyện viên" },
+        { english: "referee", vietnamese: "trọng tài" }, { english: "team", vietnamese: "đội, nhóm" }, { english: "group", vietnamese: "nhóm" },
+        { english: "match", vietnamese: "trận đấu" }, { english: "game", vietnamese: "trò chơi / trận đấu" },
+        { english: "competition", vietnamese: "cuộc thi, cuộc thi đấu" }, { english: "tournament", vietnamese: "giải đấu" },
+        { english: "championship", vietnamese: "chức vô địch" }, { english: "champion", vietnamese: "nhà vô địch" },
+        { english: "win", vietnamese: "chiến thắng" }, { english: "lose", vietnamese: "thua" }, { english: "draw", vietnamese: "hòa" },
+        { english: "score", vietnamese: "ghi bàn, điểm số" }, { english: "point", vietnamese: "điểm" },
+        { english: "goal", vietnamese: "bàn thắng, mục tiêu" }, { english: "rule", vietnamese: "luật chơi" },
+        { english: "fair play", vietnamese: "tinh thần thể thao" }, { english: "follow the rules", vietnamese: "tuân thủ luật" },
+        { english: "break the rules", vietnamese: "phạm luật" }, { english: "field", vietnamese: "sân (cỏ, thể thao)" },
+        { english: "pitch", vietnamese: "sân bóng đá" }, { english: "court", vietnamese: "sân tennis / bóng rổ" },
+        { english: "stadium", vietnamese: "sân vận động" }, { english: "gym", vietnamese: "phòng tập thể dục" },
+        { english: "playground", vietnamese: "sân chơi" }, { english: "swimming pool", vietnamese: "hồ bơi" },
+        { english: "fitness centre", vietnamese: "trung tâm thể hình" }, { english: "sports club", vietnamese: "câu lạc bộ thể thao" },
+        { english: "sports equipment", vietnamese: "dụng cụ thể thao" }, { english: "racket", vietnamese: "vợt" },
+        { english: "ball", vietnamese: "quả bóng" }, { english: "bat", vietnamese: "gậy đánh bóng" }, { english: "net", vietnamese: "lưới" },
+        { english: "gloves", vietnamese: "găng tay" }, { english: "shoes", vietnamese: "giày" }, { english: "trainers", vietnamese: "giày thể thao" },
+        { english: "uniform", vietnamese: "đồng phục thể thao" }, { english: "helmet", vietnamese: "mũ bảo hiểm" }, { english: "skate", vietnamese: "trượt" },
+        { english: "skateboard", vietnamese: "ván trượt" }, { english: "rollerblading", vietnamese: "trượt patin" },
+        { english: "skiing", vietnamese: "trượt tuyết" }, { english: "snowboarding", vietnamese: "trượt ván tuyết" },
+        { english: "running", vietnamese: "chạy" }, { english: "jogging", vietnamese: "chạy bộ nhẹ" }, { english: "cycling", vietnamese: "đạp xe" },
+        { english: "swimming", vietnamese: "bơi lội" }, { english: "football", vietnamese: "bóng đá" },
+        { english: "soccer", vietnamese: "bóng đá (Anh Mỹ)" }, { english: "basketball", vietnamese: "bóng rổ" },
+        { english: "volleyball", vietnamese: "bóng chuyền" }, { english: "badminton", vietnamese: "cầu lông" },
+        { english: "table tennis", vietnamese: "bóng bàn" }, { english: "tennis", vietnamese: "quần vợt" },
+        { english: "baseball", vietnamese: "bóng chày" }, { english: "golf", vietnamese: "đánh gôn" },
+        { english: "hockey", vietnamese: "khúc côn cầu" }, { english: "martial arts", vietnamese: "võ thuật" },
+        { english: "karate", vietnamese: "karate" }, { english: "judo", vietnamese: "judo" },
+        { english: "gymnastics", vietnamese: "thể dục dụng cụ" }, { english: "aerobics", vietnamese: "thể dục nhịp điệu" },
+        { english: "yoga", vietnamese: "yoga" }, { english: "dance", vietnamese: "nhảy múa" }, { english: "hiking", vietnamese: "đi bộ đường dài" },
+        { english: "climbing", vietnamese: "leo núi" }, { english: "fishing", vietnamese: "câu cá" }, { english: "camping", vietnamese: "cắm trại" },
+        { english: "sailing", vietnamese: "chèo thuyền buồm" }, { english: "surfing", vietnamese: "lướt sóng" }, { english: "diving", vietnamese: "lặn" },
+        { english: "skating", vietnamese: "trượt băng" }, { english: "race", vietnamese: "cuộc đua" }, { english: "runner", vietnamese: "người chạy" },
+        { english: "swimmer", vietnamese: "người bơi" }, { english: "cyclist", vietnamese: "người đạp xe" },
+        { english: "practice", vietnamese: "luyện tập" }, { english: "training", vietnamese: "huấn luyện" },
+        { english: "warm up", vietnamese: "khởi động" }, { english: "cool down", vietnamese: "thư giãn sau khi tập" },
+        { english: "stretch", vietnamese: "giãn cơ" }, { english: "improve skills", vietnamese: "cải thiện kỹ năng" },
+        { english: "try your best", vietnamese: "cố gắng hết sức" }, { english: "take part in", vietnamese: "tham gia vào" },
+        { english: "participate in", vietnamese: "tham gia" }, { english: "join a sport club", vietnamese: "tham gia CLB thể thao" },
+        { english: "play sports regularly", vietnamese: "chơi thể thao thường xuyên" }, { english: "keep fit", vietnamese: "giữ dáng" },
+        { english: "stay healthy", vietnamese: "giữ sức khỏe" }, { english: "active lifestyle", vietnamese: "lối sống năng động" },
+        { english: "spend time outdoors", vietnamese: "dành thời gian ngoài trời" }, { english: "be good at sports", vietnamese: "giỏi thể thao" },
+        { english: "enjoy doing sports", vietnamese: "thích chơi thể thao" }, { english: "cheer", vietnamese: "cổ vũ" },
+        { english: "cheerleader", vietnamese: "cổ động viên" }, { english: "score a goal", vietnamese: "ghi bàn" },
+        { english: "win a prize", vietnamese: "giành giải thưởng" }, { english: "medal", vietnamese: "huy chương" },
+        { english: "trophy", vietnamese: "cúp" }, { english: "proud", vietnamese: "tự hào" }, { english: "tired", vietnamese: "mệt" },
+        { english: "energetic", vietnamese: "tràn đầy năng lượng" }, { english: "injured", vietnamese: "bị thương" },
+        { english: "injury", vietnamese: "chấn thương" }, { english: "dangerous", vietnamese: "nguy hiểm" },
+        { english: "safety", vietnamese: "an toàn" }, { english: "accident", vietnamese: "tai nạn" }, { english: "exercise", vietnamese: "bài tập thể dục" },
+        { english: "do exercise", vietnamese: "tập thể dục" }, { english: "do aerobics", vietnamese: "tập thể dục nhịp điệu" },
+        { english: "do yoga", vietnamese: "tập yoga" }, { english: "go running", vietnamese: "đi chạy" }, { english: "go cycling", vietnamese: "đi xe đạp" },
+        { english: "go swimming", vietnamese: "đi bơi" }, { english: "go hiking", vietnamese: "đi leo núi" },
+        { english: "go fishing", vietnamese: "đi câu cá" }, { english: "go camping", vietnamese: "đi cắm trại" },
+        { english: "sports day", vietnamese: "ngày hội thể thao" }, { english: "physical education (PE)", vietnamese: "môn thể dục" },
+        { english: "teacher", vietnamese: "giáo viên thể dục" }, { english: "healthy competition", vietnamese: "thi đấu lành mạnh" },
+        { english: "teamwork", vietnamese: "làm việc nhóm" }, { english: "cooperate", vietnamese: "hợp tác" },
+        { english: "encourage", vietnamese: "khuyến khích" }, { english: "improve health", vietnamese: "cải thiện sức khỏe" },
+        { english: "build muscles", vietnamese: "tăng cơ bắp" }, { english: "lose weight", vietnamese: "giảm cân" },
+        { english: "burn calories", vietnamese: "đốt calo" }, { english: "feel relaxed", vietnamese: "cảm thấy thư giãn" },
+        { english: "feel strong", vietnamese: "cảm thấy khỏe mạnh" }, { english: "spend energy", vietnamese: "tiêu hao năng lượng" },
+        { english: "outdoor games", vietnamese: "trò chơi ngoài trời" }, { english: "indoor games", vietnamese: "trò chơi trong nhà" },
+        { english: "rest", vietnamese: "nghỉ ngơi" }, { english: "stretch your body", vietnamese: "kéo giãn cơ thể" },
+        { english: "avoid injuries", vietnamese: "tránh chấn thương" }, { english: "follow advice", vietnamese: "nghe lời khuyên" },
+        { english: "trainer", vietnamese: "người hướng dẫn tập luyện" }, { english: "equipment", vietnamese: "thiết bị" },
+    ]
+  },
+  {
+    title: "HOME & DAILY LIFE",
+    words: [
+        { english: "whistle", vietnamese: "còi" }, { english: "race", vietnamese: "cuộc thi chạy" }, { english: "start", vietnamese: "bắt đầu" },
+        { english: "finish", vietnamese: "kết thúc" }, { english: "win a match", vietnamese: "thắng trận" }, { english: "lose a game", vietnamese: "thua trận" },
+        { english: "play fair", vietnamese: "chơi công bằng" }, { english: "team spirit", vietnamese: "tinh thần đồng đội" }, { english: "home", vietnamese: "nhà" },
+        { english: "house", vietnamese: "ngôi nhà" }, { english: "flat / apartment", vietnamese: "căn hộ" }, { english: "room", vietnamese: "căn phòng" },
+        { english: "living room", vietnamese: "phòng khách" }, { english: "bedroom", vietnamese: "phòng ngủ" }, { english: "bathroom", vietnamese: "phòng tắm" },
+        { english: "kitchen", vietnamese: "nhà bếp" }, { english: "dining room", vietnamese: "phòng ăn" }, { english: "study room", vietnamese: "phòng học" },
+        { english: "garden", vietnamese: "khu vườn" }, { english: "balcony", vietnamese: "ban công" }, { english: "roof", vietnamese: "mái nhà" },
+        { english: "floor", vietnamese: "sàn nhà" }, { english: "wall", vietnamese: "tường" }, { english: "window", vietnamese: "cửa sổ" },
+        { english: "door", vietnamese: "cửa ra vào" }, { english: "light", vietnamese: "ánh sáng" }, { english: "lamp", vietnamese: "đèn bàn" },
+        { english: "ceiling", vietnamese: "trần nhà" }, { english: "stairs", vietnamese: "cầu thang" }, { english: "corridor", vietnamese: "hành lang" },
+        { english: "yard", vietnamese: "sân" }, { english: "fence", vietnamese: "hàng rào" }, { english: "gate", vietnamese: "cổng" },
+        { english: "chimney", vietnamese: "ống khói" }, { english: "furniture", vietnamese: "đồ nội thất" }, { english: "sofa", vietnamese: "ghế sô-pha" },
+        { english: "armchair", vietnamese: "ghế bành" }, { english: "table", vietnamese: "cái bàn" }, { english: "chair", vietnamese: "cái ghế" },
+        { english: "bed", vietnamese: "cái giường" }, { english: "pillow", vietnamese: "gối" }, { english: "blanket", vietnamese: "chăn" },
+        { english: "sheet", vietnamese: "ga giường" }, { english: "cupboard", vietnamese: "tủ đựng chén" }, { english: "wardrobe", vietnamese: "tủ quần áo" },
+        { english: "desk", vietnamese: "bàn học" }, { english: "bookshelf", vietnamese: "giá sách" }, { english: "carpet", vietnamese: "thảm" },
+        { english: "curtain", vietnamese: "rèm cửa" }, { english: "fridge", vietnamese: "tủ lạnh" }, { english: "cooker", vietnamese: "bếp nấu" },
+        { english: "sink", vietnamese: "bồn rửa" }, { english: "washbasin", vietnamese: "chậu rửa mặt" }, { english: "toilet", vietnamese: "nhà vệ sinh" },
+        { english: "mirror", vietnamese: "gương" }, { english: "painting", vietnamese: "bức tranh" }, { english: "clock", vietnamese: "đồng hồ" },
+        { english: "plant", vietnamese: "cây trồng" }, { english: "air conditioner", vietnamese: "máy điều hòa" }, { english: "fan", vietnamese: "quạt" },
+        { english: "washing machine", vietnamese: "máy giặt" }, { english: "television / TV", vietnamese: "tivi" }, { english: "remote control", vietnamese: "điều khiển từ xa" },
+        { english: "clean", vietnamese: "sạch sẽ" }, { english: "tidy", vietnamese: "gọn gàng" }, { english: "messy", vietnamese: "bừa bộn" },
+        { english: "comfortable", vietnamese: "thoải mái" }, { english: "cosy", vietnamese: "ấm cúng" }, { english: "quiet", vietnamese: "yên tĩnh" },
+        { english: "noisy", vietnamese: "ồn ào" }, { english: "modern", vietnamese: "hiện đại" }, { english: "historic", vietnamese: "có giá trị lịch sử" },
+        { english: "convenient", vietnamese: "tiện lợi" }, { english: "move house", vietnamese: "chuyển nhà" }, { english: "live in", vietnamese: "sống ở" },
+        { english: "neighbor", vietnamese: "hàng xóm" }, { english: "neighborhood", vietnamese: "khu dân cư" }, { english: "city", vietnamese: "thành phố" },
+        { english: "town", vietnamese: "thị trấn" }, { english: "village", vietnamese: "làng quê" }, { english: "countryside", vietnamese: "nông thôn" },
+        { english: "street", vietnamese: "con phố" }, { english: "road", vietnamese: "con đường" }, { english: "park", vietnamese: "công viên" },
+        { english: "river", vietnamese: "con sông" }, { english: "lake", vietnamese: "hồ nước" }, { english: "seaside", vietnamese: "bờ biển" },
+        { english: "mountain", vietnamese: "ngọn núi" }, { english: "place", vietnamese: "địa điểm" }, { english: "address", vietnamese: "địa chỉ" },
+        { english: "go home", vietnamese: "về nhà" }, { english: "come home", vietnamese: "về tới nhà" }, { english: "leave home", vietnamese: "rời nhà" },
+        { english: "stay at home", vietnamese: "ở nhà" }, { english: "daily", vietnamese: "hằng ngày" }, { english: "routine", vietnamese: "thói quen" },
+        { english: "daily routine", vietnamese: "sinh hoạt hằng ngày" }, { english: "every day", vietnamese: "mỗi ngày" }, { english: "in the morning", vietnamese: "vào buổi sáng" },
+        { english: "in the afternoon", vietnamese: "vào buổi chiều" }, { english: "in the evening", vietnamese: "vào buổi tối" }, { english: "at night", vietnamese: "vào ban đêm" },
+        { english: "wake up", vietnamese: "thức dậy" }, { english: "get up", vietnamese: "ra khỏi giường" }, { english: "get dressed", vietnamese: "mặc quần áo" },
+        { english: "brush teeth", vietnamese: "đánh răng" }, { english: "wash face", vietnamese: "rửa mặt" }, { english: "take a shower", vietnamese: "tắm" },
+        { english: "comb hair", vietnamese: "chải tóc" }, { english: "have breakfast", vietnamese: "ăn sáng" }, { english: "go to school", vietnamese: "đi học" },
+        { english: "go to work", vietnamese: "đi làm" }, { english: "study", vietnamese: "học" }, { english: "do homework", vietnamese: "làm bài tập" },
+        { english: "have lunch", vietnamese: "ăn trưa" }, { english: "have dinner", vietnamese: "ăn tối" }, { english: "take a nap", vietnamese: "ngủ trưa" },
+        { english: "watch TV", vietnamese: "xem tivi" }, { english: "listen to music", vietnamese: "nghe nhạc" }, { english: "read books", vietnamese: "đọc sách" },
+        { english: "surf the Internet", vietnamese: "lướt mạng" }, { english: "play games", vietnamese: "chơi trò chơi" }, { english: "go out", vietnamese: "đi ra ngoài" },
+        { english: "meet friends", vietnamese: "gặp bạn" }, { english: "talk with family", vietnamese: "nói chuyện với gia đình" }, { english: "feed the pets", vietnamese: "cho thú cưng ăn" },
+        { english: "walk the dog", vietnamese: "dắt chó đi dạo" }, { english: "clean the room", vietnamese: "dọn phòng" }, { english: "tidy the room", vietnamese: "sắp xếp phòng" },
+        { english: "sweep the floor", vietnamese: "quét nhà" }, { english: "mop the floor", vietnamese: "lau nhà" }, { english: "wash the dishes", vietnamese: "rửa chén" },
+        { english: "do the laundry", vietnamese: "giặt quần áo" }, { english: "hang the clothes", vietnamese: "phơi đồ" }, { english: "cook dinner", vietnamese: "nấu bữa tối" },
+        { english: "water the plants", vietnamese: "tưới cây" }, { english: "take out the rubbish", vietnamese: "đổ rác" }, { english: "do housework", vietnamese: "làm việc nhà" },
+        { english: "help parents", vietnamese: "giúp bố mẹ" }, { english: "go shopping", vietnamese: "đi mua sắm" }, { english: "relax", vietnamese: "thư giãn" },
+        { english: "take a rest", vietnamese: "nghỉ ngơi" }, { english: "go to bed", vietnamese: "đi ngủ" }, { english: "sleep", vietnamese: "ngủ" },
+        { english: "weekend", vietnamese: "cuối tuần" }, { english: "holiday", vietnamese: "kỳ nghỉ" }, { english: "spend time with family", vietnamese: "dành thời gian với gia đình" },
+        { english: "spend time watching TV", vietnamese: "dành thời gian xem tivi" }, { english: "on weekdays", vietnamese: "vào các ngày trong tuần" }, { english: "on weekends", vietnamese: "vào cuối tuần" },
+        { english: "sometimes", vietnamese: "thỉnh thoảng" }, { english: "often", vietnamese: "thường xuyên" }, { english: "usually", vietnamese: "thường" },
+        { english: "always", vietnamese: "luôn luôn" }, { english: "never", vietnamese: "không bao giờ" }, { english: "after school", vietnamese: "sau giờ học" },
+        { english: "before bed", vietnamese: "trước khi ngủ" }, { english: "at home", vietnamese: "ở nhà" }, { english: "outside", vietnamese: "bên ngoài" },
+        { english: "inside", vietnamese: "bên trong" }, { english: "together", vietnamese: "cùng nhau" }, { english: "alone", vietnamese: "một mình" },
+        { english: "be busy with", vietnamese: "bận rộn với" }, { english: "feel tired", vietnamese: "cảm thấy mệt" }, { english: "feel relaxed", vietnamese: "cảm thấy thư giãn" },
+        { english: "take a break", vietnamese: "nghỉ giải lao" }, { english: "time", vietnamese: "thời gian" }, { english: "schedule", vietnamese: "lịch trình" },
+        { english: "plan", vietnamese: "kế hoạch" }, { english: "day", vietnamese: "ngày" }, { english: "weekend activity", vietnamese: "hoạt động cuối tuần" },
+        { english: "household chores", vietnamese: "việc nhà" }, { english: "spend", vietnamese: "dành (thời gian / tiền)" }, { english: "finish", vietnamese: "hoàn thành" },
+        { english: "start", vietnamese: "bắt đầu" }, { english: "need", vietnamese: "cần" }, { english: "want", vietnamese: "muốn" }, { english: "like", vietnamese: "thích" },
+        { english: "enjoy", vietnamese: "tận hưởng" }, { english: "hate", vietnamese: "ghét" }, { english: "prefer", vietnamese: "thích hơn" },
+        { english: "help", vietnamese: "giúp đỡ" }, { english: "together", vietnamese: "cùng nhau" }, { english: "home town", vietnamese: "quê hương" },
+        { english: "modern life", vietnamese: "cuộc sống hiện đại" }, { english: "countryside life", vietnamese: "cuộc sống nông thôn" },
+    ]
+  },
+  {
+    title: "ENVIRONMENT & TRAVEL",
+    words: [
+        { english: "environment", vietnamese: "môi trường" }, { english: "natural environment", vietnamese: "môi trường tự nhiên" },
+        { english: "nature", vietnamese: "thiên nhiên" }, { english: "clean air", vietnamese: "không khí trong lành" },
+        { english: "fresh air", vietnamese: "không khí tươi mát" }, { english: "polluted air", vietnamese: "không khí bị ô nhiễm" },
+        { english: "pollution", vietnamese: "sự ô nhiễm" }, { english: "air pollution", vietnamese: "ô nhiễm không khí" },
+        { english: "water pollution", vietnamese: "ô nhiễm nước" }, { english: "noise pollution", vietnamese: "ô nhiễm tiếng ồn" },
+        { english: "light pollution", vietnamese: "ô nhiễm ánh sáng" }, { english: "pollution-free", vietnamese: "không ô nhiễm" },
+        { english: "pollutant", vietnamese: "chất gây ô nhiễm" }, { english: "unpolluted", vietnamese: "không bị ô nhiễm" },
+        { english: "recycle", vietnamese: "tái chế" }, { english: "reuse", vietnamese: "tái sử dụng" },
+        { english: "reduce", vietnamese: "giảm bớt" }, { english: "save energy", vietnamese: "tiết kiệm năng lượng" },
+        { english: "save water", vietnamese: "tiết kiệm nước" }, { english: "waste", vietnamese: "lãng phí / rác thải" },
+        { english: "rubbish", vietnamese: "rác" }, { english: "trash", vietnamese: "rác (Mỹ)" },
+        { english: "garbage", vietnamese: "rác thải sinh hoạt" }, { english: "throw away", vietnamese: "vứt đi" },
+        { english: "clean up", vietnamese: "dọn dẹp" }, { english: "plant trees", vietnamese: "trồng cây" },
+        { english: "protect the environment", vietnamese: "bảo vệ môi trường" }, { english: "keep the air clean", vietnamese: "giữ không khí sạch" },
+        { english: "pick up litter", vietnamese: "nhặt rác" }, { english: "plastic bag", vietnamese: "túi nhựa" },
+        { english: "plastic waste", vietnamese: "rác nhựa" }, { english: "energy", vietnamese: "năng lượng" },
+        { english: "solar energy", vietnamese: "năng lượng mặt trời" }, { english: "renewable energy", vietnamese: "năng lượng tái tạo" },
+        { english: "electricity", vietnamese: "điện" }, { english: "turn off", vietnamese: "tắt (đèn, thiết bị)" },
+        { english: "turn on", vietnamese: "bật" }, { english: "factory", vietnamese: "nhà máy" }, { english: "smoke", vietnamese: "khói" },
+        { english: "traffic jam", vietnamese: "kẹt xe" }, { english: "heavy traffic", vietnamese: "giao thông đông đúc" },
+        { english: "transport / transportation", vietnamese: "giao thông, phương tiện vận chuyển" }, { english: "transport system", vietnamese: "hệ thống giao thông" },
+        { english: "public transport", vietnamese: "phương tiện công cộng" }, { english: "bus", vietnamese: "xe buýt" },
+        { english: "train", vietnamese: "tàu hỏa" }, { english: "subway / metro", vietnamese: "tàu điện ngầm" },
+        { english: "car", vietnamese: "xe hơi" }, { english: "motorbike", vietnamese: "xe máy" }, { english: "bicycle", vietnamese: "xe đạp" },
+        { english: "plane", vietnamese: "máy bay" }, { english: "ship", vietnamese: "tàu thủy" }, { english: "boat", vietnamese: "thuyền nhỏ" },
+        { english: "travel", vietnamese: "đi du lịch" }, { english: "trip", vietnamese: "chuyến đi ngắn" }, { english: "journey", vietnamese: "chuyến hành trình" },
+        { english: "tour", vietnamese: "chuyến du lịch" }, { english: "tour guide", vietnamese: "hướng dẫn viên du lịch" }, { english: "tourist", vietnamese: "khách du lịch" },
+        { english: "tourism", vietnamese: "ngành du lịch" }, { english: "sightseeing", vietnamese: "tham quan" }, { english: "go sightseeing", vietnamese: "đi tham quan" },
+        { english: "travel abroad", vietnamese: "đi du lịch nước ngoài" }, { english: "go camping", vietnamese: "đi cắm trại" },
+        { english: "go hiking", vietnamese: "đi bộ đường dài" }, { english: "go by bus", vietnamese: "đi bằng xe buýt" },
+        { english: "go by train", vietnamese: "đi bằng tàu" }, { english: "go by bike", vietnamese: "đi xe đạp" },
+        { english: "go by car", vietnamese: "đi ô tô" }, { english: "go on holiday", vietnamese: "đi nghỉ mát" },
+        { english: "on vacation", vietnamese: "trong kỳ nghỉ" }, { english: "at the seaside", vietnamese: "ở bờ biển" },
+        { english: "by the sea", vietnamese: "cạnh biển" }, { english: "beach", vietnamese: "bãi biển" }, { english: "island", vietnamese: "hòn đảo" },
+        { english: "mountain", vietnamese: "núi" }, { english: "forest", vietnamese: "rừng" }, { english: "lake", vietnamese: "hồ" },
+        { english: "river", vietnamese: "sông" }, { english: "waterfall", vietnamese: "thác nước" }, { english: "countryside", vietnamese: "nông thôn" },
+        { english: "city", vietnamese: "thành phố" }, { english: "capital city", vietnamese: "thủ đô" }, { english: "town", vietnamese: "thị trấn" },
+        { english: "village", vietnamese: "làng" }, { english: "province", vietnamese: "tỉnh" }, { english: "district", vietnamese: "quận, huyện" },
+        { english: "area", vietnamese: "khu vực" }, { english: "region", vietnamese: "vùng miền" }, { english: "place", vietnamese: "địa điểm" },
+        { english: "location", vietnamese: "vị trí" }, { english: "destination", vietnamese: "điểm đến" }, { english: "local people", vietnamese: "người địa phương" },
+        { english: "culture", vietnamese: "văn hóa" }, { english: "custom", vietnamese: "phong tục" }, { english: "tradition", vietnamese: "truyền thống" },
+        { english: "event", vietnamese: "sự kiện" }, { english: "festival", vietnamese: "lễ hội" }, { english: "fair", vietnamese: "hội chợ" },
+        { english: "experience", vietnamese: "trải nghiệm" }, { english: "explore", vietnamese: "khám phá" }, { english: "visit", vietnamese: "thăm viếng" },
+        { english: "sightseeing spot", vietnamese: "địa điểm tham quan" }, { english: "ancient", vietnamese: "cổ xưa" }, { english: "historic", vietnamese: "có ý nghĩa lịch sử" },
+        { english: "historical", vietnamese: "thuộc về lịch sử" }, { english: "modern", vietnamese: "hiện đại" }, { english: "modernise", vietnamese: "hiện đại hóa" },
+        { english: "modernisation", vietnamese: "sự hiện đại hóa" }, { english: "skyscraper", vietnamese: "tòa nhà chọc trời" }, { english: "building", vietnamese: "tòa nhà" },
+        { english: "bridge", vietnamese: "cây cầu" }, { english: "street", vietnamese: "con phố" }, { english: "square", vietnamese: "quảng trường" },
+        { english: "park", vietnamese: "công viên" }, { english: "market", vietnamese: "chợ" }, { english: "museum", vietnamese: "viện bảo tàng" },
+        { english: "art gallery", vietnamese: "phòng trưng bày nghệ thuật" }, { english: "theatre", vietnamese: "nhà hát" }, { english: "cinema", vietnamese: "rạp chiếu phim" },
+        { english: "station", vietnamese: "nhà ga" }, { english: "bus stop", vietnamese: "trạm xe buýt" }, { english: "airport", vietnamese: "sân bay" },
+        { english: "hotel", vietnamese: "khách sạn" }, { english: "restaurant", vietnamese: "nhà hàng" }, { english: "café", vietnamese: "quán cà phê" },
+        { english: "shop", vietnamese: "cửa hàng" }, { english: "supermarket", vietnamese: "siêu thị" }, { english: "hospital", vietnamese: "bệnh viện" },
+        { english: "post office", vietnamese: "bưu điện" }, { english: "school", vietnamese: "trường học" }, { english: "factory", vietnamese: "nhà máy" },
+        { english: "temple", vietnamese: "đền" }, { english: "pagoda", vietnamese: "chùa" }, { english: "church", vietnamese: "nhà thờ" },
+        { english: "farm", vietnamese: "trang trại" }, { english: "field", vietnamese: "cánh đồng" }, { english: "countryside life", vietnamese: "cuộc sống nông thôn" },
+        { english: "city life", vietnamese: "cuộc sống thành thị" }, { english: "modern life", vietnamese: "cuộc sống hiện đại" }, { english: "busy", vietnamese: "bận rộn, đông đúc" },
+        { english: "crowded", vietnamese: "đông đúc" }, { english: "peaceful", vietnamese: "yên bình" }, { english: "quiet", vietnamese: "yên tĩnh" },
+        { english: "noisy", vietnamese: "ồn ào" }, { english: "safe", vietnamese: "an toàn" }, { english: "dangerous", vietnamese: "nguy hiểm" },
+        { english: "polluted", vietnamese: "bị ô nhiễm" }, { english: "clean", vietnamese: "sạch sẽ" }, { english: "convenient", vietnamese: "tiện lợi" },
+        { english: "beautiful", vietnamese: "đẹp" }, { english: "scenery", vietnamese: "phong cảnh" }, { english: "view", vietnamese: "quang cảnh" },
+        { english: "sight", vietnamese: "cảnh đẹp" }, { english: "work of art", vietnamese: "tác phẩm nghệ thuật" }, { english: "landmark", vietnamese: "địa danh nổi tiếng" },
+        { english: "tourist attraction", vietnamese: "điểm thu hút khách du lịch" }, { english: "adventure", vietnamese: "cuộc phiêu lưu" }, { english: "natural disaster", vietnamese: "thiên tai" },
+        { english: "disaster", vietnamese: "thảm họa" }, { english: "earthquake", vietnamese: "động đất" }, { english: "volcano", vietnamese: "núi lửa" },
+        { english: "volcanic eruption", vietnamese: "vụ phun trào núi lửa" }, { english: "landslide", vietnamese: "sạt lở đất" }, { english: "flood", vietnamese: "lũ lụt" },
+        { english: "storm", vietnamese: "bão" }, { english: "stormy", vietnamese: "có giông bão" }, { english: "tsunami", vietnamese: "sóng thần" },
+        { english: "destroy", vietnamese: "phá hủy" }, { english: "destruction", vietnamese: "sự tàn phá" }, { english: "destructive", vietnamese: "mang tính phá hoại" },
+        { english: "erupt", vietnamese: "phun trào" }, { english: "eruption", vietnamese: "sự phun trào" }, { english: "explosion", vietnamese: "vụ nổ" },
+        { english: "explode", vietnamese: "nổ tung" }, { english: "injured", vietnamese: "bị thương" }, { english: "injury", vietnamese: "vết thương" },
+        { english: "damage", vietnamese: "thiệt hại" }, { english: "rescue", vietnamese: "cứu hộ" }, { english: "survivor", vietnamese: "người sống sót" },
+        { english: "cause", vietnamese: "nguyên nhân" }, { english: "effect", vietnamese: "tác động" }, { english: "reduce damage", vietnamese: "giảm thiệt hại" },
+        { english: "warning", vietnamese: "cảnh báo" }, { english: "emergency", vietnamese: "tình huống khẩn cấp" }, { english: "prepare", vietnamese: "chuẩn bị" },
+        { english: "rebuild", vietnamese: "tái xây dựng" }, { english: "recover", vietnamese: "hồi phục" }, { english: "donate", vietnamese: "quyên góp" },
+        { english: "volunteer", vietnamese: "tình nguyện" }, { english: "provide", vietnamese: "cung cấp" }, { english: "relief", vietnamese: "cứu trợ" },
+        { english: "disaster area", vietnamese: "khu vực bị thiên tai" }, { english: "rebuild houses", vietnamese: "xây lại nhà" }, { english: "help people in need", vietnamese: "giúp người gặp khó khăn" },
+        { english: "safety", vietnamese: "an toàn" }, { english: "be careful", vietnamese: "cẩn thận" }, { english: "cause pollution", vietnamese: "gây ô nhiễm" },
+        { english: "protect nature", vietnamese: "bảo vệ thiên nhiên" }, { english: "keep the city clean", vietnamese: "giữ thành phố sạch đẹp" },
+    ]
+  },
+  {
+    title: "GRAMMAR & FUNCTION WORDS",
+    words: [
+        { english: "I", vietnamese: "tôi" }, { english: "you", vietnamese: "bạn" }, { english: "he", vietnamese: "anh ấy" },
+        { english: "she", vietnamese: "cô ấy" }, { english: "it", vietnamese: "nó" }, { english: "we", vietnamese: "chúng tôi" },
+        { english: "they", vietnamese: "họ" }, { english: "me", vietnamese: "tôi (tân ngữ)" }, { english: "him", vietnamese: "anh ấy (tân ngữ)" },
+        { english: "her", vietnamese: "cô ấy (tân ngữ)" }, { english: "us", vietnamese: "chúng tôi (tân ngữ)" }, { english: "them", vietnamese: "họ (tân ngữ)" },
+        { english: "my", vietnamese: "của tôi" }, { english: "your", vietnamese: "của bạn" }, { english: "his", vietnamese: "của anh ấy" },
+        { english: "her", vietnamese: "của cô ấy" }, { english: "our", vietnamese: "của chúng tôi" }, { english: "their", vietnamese: "của họ" },
+        { english: "myself", vietnamese: "bản thân tôi" }, { english: "yourself", vietnamese: "bản thân bạn" }, { english: "himself", vietnamese: "bản thân anh ấy" },
+        { english: "herself", vietnamese: "bản thân cô ấy" }, { english: "themselves", vietnamese: "bản thân họ" }, { english: "this", vietnamese: "cái này" },
+        { english: "that", vietnamese: "cái kia" }, { english: "these", vietnamese: "những cái này" }, { english: "those", vietnamese: "những cái kia" },
+        { english: "a / an", vietnamese: "một" }, { english: "the", vietnamese: "cái, con, người (xác định)" }, { english: "some", vietnamese: "một vài" },
+        { english: "any", vietnamese: "bất kỳ" }, { english: "much", vietnamese: "nhiều (không đếm được)" }, { english: "many", vietnamese: "nhiều (đếm được)" },
+        { english: "a lot of", vietnamese: "rất nhiều" }, { english: "a few", vietnamese: "một vài (đếm được)" }, { english: "a little", vietnamese: "một ít (không đếm được)" },
+        { english: "enough", vietnamese: "đủ" }, { english: "too much", vietnamese: "quá nhiều (không đếm được)" }, { english: "too many", vietnamese: "quá nhiều (đếm được)" },
+        { english: "both ... and ...", vietnamese: "cả ... và ..." }, { english: "either ... or ...", vietnamese: "hoặc ... hoặc ..." }, { english: "neither ... nor ...", vietnamese: "không ... cũng không ..." },
+        { english: "because", vietnamese: "bởi vì" }, { english: "so", vietnamese: "nên" }, { english: "although", vietnamese: "mặc dù" },
+        { english: "but", vietnamese: "nhưng" }, { english: "and", vietnamese: "và" }, { english: "or", vietnamese: "hoặc" }, { english: "if", vietnamese: "nếu" },
+        { english: "when", vietnamese: "khi" }, { english: "while", vietnamese: "trong khi" }, { english: "before", vietnamese: "trước khi" },
+        { english: "after", vietnamese: "sau khi" }, { english: "since", vietnamese: "kể từ khi" }, { english: "for", vietnamese: "trong (khoảng thời gian)" },
+        { english: "during", vietnamese: "trong suốt" }, { english: "at", vietnamese: "tại, lúc" }, { english: "in", vietnamese: "trong" },
+        { english: "on", vietnamese: "trên / vào (ngày)" }, { english: "under", vietnamese: "dưới" }, { english: "behind", vietnamese: "phía sau" },
+        { english: "in front of", vietnamese: "phía trước" }, { english: "between", vietnamese: "ở giữa" }, { english: "next to", vietnamese: "bên cạnh" },
+        { english: "near", vietnamese: "gần" }, { english: "opposite", vietnamese: "đối diện" }, { english: "across from", vietnamese: "đối diện với" },
+        { english: "above", vietnamese: "phía trên" }, { english: "below", vietnamese: "phía dưới" }, { english: "from", vietnamese: "từ" },
+        { english: "to", vietnamese: "đến" }, { english: "into", vietnamese: "vào bên trong" }, { english: "out of", vietnamese: "ra khỏi" },
+        { english: "over", vietnamese: "bên trên, vượt qua" }, { english: "through", vietnamese: "xuyên qua" }, { english: "with", vietnamese: "với" },
+        { english: "without", vietnamese: "không có" }, { english: "about", vietnamese: "về" }, { english: "of", vietnamese: "của" },
+        { english: "at home", vietnamese: "ở nhà" }, { english: "at school", vietnamese: "ở trường" }, { english: "at the weekend", vietnamese: "vào cuối tuần" },
+        { english: "on Sunday", vietnamese: "vào Chủ nhật" }, { english: "in the morning", vietnamese: "vào buổi sáng" }, { english: "in the evening", vietnamese: "vào buổi tối" },
+        { english: "by bus", vietnamese: "bằng xe buýt" }, { english: "by car", vietnamese: "bằng ô tô" }, { english: "on foot", vietnamese: "đi bộ" },
+        { english: "by plane", vietnamese: "bằng máy bay" }, { english: "today", vietnamese: "hôm nay" }, { english: "yesterday", vietnamese: "hôm qua" },
+        { english: "tomorrow", vietnamese: "ngày mai" }, { english: "last night", vietnamese: "tối qua" }, { english: "last week", vietnamese: "tuần trước" },
+        { english: "next week", vietnamese: "tuần tới" }, { english: "ago", vietnamese: "trước đây" }, { english: "now", vietnamese: "bây giờ" },
+        { english: "at the moment", vietnamese: "ngay lúc này" }, { english: "every day", vietnamese: "mỗi ngày" }, { english: "always", vietnamese: "luôn luôn" },
+        { english: "usually", vietnamese: "thường" }, { english: "often", vietnamese: "thường xuyên" }, { english: "sometimes", vietnamese: "thỉnh thoảng" },
+        { english: "rarely", vietnamese: "hiếm khi" }, { english: "never", vietnamese: "không bao giờ" }, { english: "already", vietnamese: "đã, rồi" },
+        { english: "yet", vietnamese: "chưa" }, { english: "just", vietnamese: "vừa mới" }, { english: "still", vietnamese: "vẫn còn" },
+        { english: "then", vietnamese: "sau đó" }, { english: "soon", vietnamese: "sớm" }, { english: "early", vietnamese: "sớm" },
+        { english: "late", vietnamese: "muộn" }, { english: "here", vietnamese: "ở đây" }, { english: "there", vietnamese: "ở đó" },
+        { english: "everywhere", vietnamese: "khắp nơi" }, { english: "somewhere", vietnamese: "nơi nào đó" }, { english: "nowhere", vietnamese: "không nơi nào" },
+        { english: "very", vietnamese: "rất" }, { english: "really", vietnamese: "thật sự" }, { english: "quite", vietnamese: "khá" },
+        { english: "too", vietnamese: "quá" }, { english: "enough", vietnamese: "đủ" }, { english: "more", vietnamese: "nhiều hơn" },
+        { english: "less", vietnamese: "ít hơn" }, { english: "most", vietnamese: "phần lớn" }, { english: "almost", vietnamese: "gần như" },
+        { english: "only", vietnamese: "chỉ" }, { english: "also", vietnamese: "cũng" }, { english: "both", vietnamese: "cả hai" },
+        { english: "either", vietnamese: "một trong hai" }, { english: "neither", vietnamese: "không cái nào" }, { english: "again", vietnamese: "lại, một lần nữa" },
+        { english: "once", vietnamese: "một lần" }, { english: "twice", vietnamese: "hai lần" }, { english: "how often", vietnamese: "bao lâu một lần" },
+        { english: "how long", vietnamese: "bao lâu" }, { english: "how far", vietnamese: "bao xa" }, { english: "how much", vietnamese: "bao nhiêu (không đếm được)" },
+        { english: "how many", vietnamese: "bao nhiêu (đếm được)" }, { english: "who", vietnamese: "ai" }, { english: "what", vietnamese: "cái gì" },
+        { english: "where", vietnamese: "ở đâu" }, { english: "when", vietnamese: "khi nào" }, { english: "why", vietnamese: "tại sao" },
+        { english: "whose", vietnamese: "của ai" }, { english: "which", vietnamese: "cái nào" }, { english: "can", vietnamese: "có thể" },
+        { english: "could", vietnamese: "có thể (lịch sự / quá khứ)" }, { english: "may", vietnamese: "có thể (cho phép)" }, { english: "might", vietnamese: "có thể (ít chắc chắn)" },
+        { english: "must", vietnamese: "phải" }, { english: "mustn't", vietnamese: "không được phép" }, { english: "should", vietnamese: "nên" },
+        { english: "shouldn't", vietnamese: "không nên" }, { english: "have to", vietnamese: "phải" }, { english: "need to", vietnamese: "cần phải" },
+        { english: "ought to", vietnamese: "nên (trang trọng)" }, { english: "will", vietnamese: "sẽ" }, { english: "would", vietnamese: "sẽ (giả định)" },
+        { english: "shall", vietnamese: "sẽ (trang trọng)" }, { english: "let's", vietnamese: "hãy cùng" }, { english: "why don't we", vietnamese: "tại sao chúng ta không" },
+        { english: "make", vietnamese: "làm" }, { english: "do", vietnamese: "thực hiện" }, { english: "have", vietnamese: "có" },
+        { english: "get", vietnamese: "nhận, lấy" }, { english: "take", vietnamese: "cầm, lấy" }, { english: "give", vietnamese: "đưa, cho" },
+        { english: "go", vietnamese: "đi" }, { english: "come", vietnamese: "đến" }, { english: "see", vietnamese: "nhìn thấy" },
+        { english: "look", vietnamese: "nhìn" }, { english: "watch", vietnamese: "xem" }, { english: "hear", vietnamese: "nghe thấy" },
+        { english: "listen", vietnamese: "lắng nghe" }, { english: "say", vietnamese: "nói (chung chung)" }, { english: "tell", vietnamese: "kể, nói cho ai đó" },
+        { english: "speak", vietnamese: "nói (ngôn ngữ)" }, { english: "ask", vietnamese: "hỏi" }, { english: "answer", vietnamese: "trả lời" },
+        { english: "help", vietnamese: "giúp" }, { english: "want", vietnamese: "muốn" }, { english: "need", vietnamese: "cần" },
+        { english: "like", vietnamese: "thích" }, { english: "love", vietnamese: "yêu thích" }, { english: "hate", vietnamese: "ghét" },
+        { english: "enjoy", vietnamese: "tận hưởng" }, { english: "prefer", vietnamese: "thích hơn" }, { english: "decide", vietnamese: "quyết định" },
+        { english: "hope", vietnamese: "hy vọng" }, { english: "plan", vietnamese: "lên kế hoạch" }, { english: "try", vietnamese: "cố gắng" },
+        { english: "learn", vietnamese: "học" }, { english: "study", vietnamese: "học tập" }, { english: "remember", vietnamese: "nhớ" },
+        { english: "forget", vietnamese: "quên" }, { english: "think", vietnamese: "nghĩ" }, { english: "believe", vietnamese: "tin tưởng" },
+        { english: "know", vietnamese: "biết" }, { english: "understand", vietnamese: "hiểu" }, { english: "mean", vietnamese: "có nghĩa là" },
+        { english: "wait", vietnamese: "chờ đợi" }, { english: "happen", vietnamese: "xảy ra" }, { english: "start", vietnamese: "bắt đầu" },
+        { english: "finish", vietnamese: "kết thúc" }, { english: "stop", vietnamese: "dừng lại" }, { english: "open", vietnamese: "mở" },
+        { english: "close", vietnamese: "đóng" }, { english: "use", vietnamese: "sử dụng" }, { english: "move", vietnamese: "di chuyển" },
+        { english: "live", vietnamese: "sống" }, { english: "work", vietnamese: "làm việc" }, { english: "travel", vietnamese: "du lịch" },
+        { english: "walk", vietnamese: "đi bộ" }, { english: "run", vietnamese: "chạy" }, { english: "swim", vietnamese: "bơi" },
+        { english: "read", vietnamese: "đọc" }, { english: "write", vietnamese: "viết" }, { english: "eat", vietnamese: "ăn" },
+        { english: "drink", vietnamese: "uống" }, { english: "sleep", vietnamese: "ngủ" }, { english: "talk", vietnamese: "nói chuyện" },
+        { english: "smile", vietnamese: "mỉm cười" }, { english: "laugh", vietnamese: "cười lớn" }, { english: "cry", vietnamese: "khóc" },
+        { english: "call", vietnamese: "gọi" }, { english: "wait for", vietnamese: "chờ đợi" }, { english: "look at", vietnamese: "nhìn vào" },
+        { english: "look after", vietnamese: "chăm sóc" }, { english: "look for", vietnamese: "tìm kiếm" }, { english: "turn off", vietnamese: "tắt" },
+        { english: "turn on", vietnamese: "bật" }, { english: "turn up", vietnamese: "vặn to" }, { english: "turn down", vietnamese: "vặn nhỏ" },
+        { english: "put on", vietnamese: "mặc vào" }, { english: "take off", vietnamese: "cởi ra" }, { english: "get up", vietnamese: "dậy" },
+        { english: "sit down", vietnamese: "ngồi xuống" }, { english: "stand up", vietnamese: "đứng dậy" }, { english: "wake up", vietnamese: "thức dậy" },
+        { english: "go out", vietnamese: "đi ra ngoài" }, { english: "go back", vietnamese: "quay lại" }, { english: "come back", vietnamese: "trở về" },
+        { english: "fill in", vietnamese: "điền vào" }, { english: "find out", vietnamese: "phát hiện ra" }, { english: "give up", vietnamese: "từ bỏ" },
+        { english: "take part in", vietnamese: "tham gia vào" }, { english: "look forward to", vietnamese: "mong chờ" }, { english: "be good at", vietnamese: "giỏi về" },
+        { english: "be interested in", vietnamese: "quan tâm đến" }, { english: "be afraid of", vietnamese: "sợ" }, { english: "be tired of", vietnamese: "mệt mỏi vì" },
+        { english: "be excited about", vietnamese: "háo hức về" }, { english: "be worried about", vietnamese: "lo lắng về" }, { english: "be bored with", vietnamese: "chán với" },
+        { english: "be different from", vietnamese: "khác với" }, { english: "be similar to", vietnamese: "giống với" }, { english: "thank you", vietnamese: "cảm ơn" },
+        { english: "you're welcome", vietnamese: "không có gì" }, { english: "excuse me", vietnamese: "xin lỗi (gây chú ý)" }, { english: "sorry", vietnamese: "xin lỗi" },
+        { english: "that's OK", vietnamese: "không sao đâu" }, { english: "congratulations", vietnamese: "chúc mừng" }, { english: "good luck", vietnamese: "chúc may mắn" },
+        { english: "what's your name?", vietnamese: "bạn tên gì?" }, { english: "how are you?", vietnamese: "bạn khỏe không?" }, { english: "I'm fine, thanks.", vietnamese: "Tôi khỏe, cảm ơn." },
+        { english: "where are you from?", vietnamese: "bạn đến từ đâu?" }, { english: "how old are you?", vietnamese: "bạn bao nhiêu tuổi?" }, { english: "nice to meet you", vietnamese: "rất vui được gặp bạn" },
+        { english: "see you later", vietnamese: "hẹn gặp lại" }, { english: "good morning", vietnamese: "chào buổi sáng" }, { english: "good afternoon", vietnamese: "chào buổi chiều" },
+        { english: "good evening", vietnamese: "chào buổi tối" }, { english: "good night", vietnamese: "chúc ngủ ngon" }, { english: "bye / goodbye", vietnamese: "tạm biệt" },
+        { english: "what do you do in your free time?", vietnamese: "bạn làm gì lúc rảnh?" }, { english: "how often do you...?", vietnamese: "bạn làm việc đó bao lâu một lần?" }, { english: "what's your favorite...?", vietnamese: "yêu thích của bạn là gì?" },
+        { english: "can you help me?", vietnamese: "bạn có thể giúp tôi không?" }, { english: "let's go!", vietnamese: "đi thôi!" }, { english: "don't worry", vietnamese: "đừng lo" },
+        { english: "be careful", vietnamese: "cẩn thận nhé" }, { english: "that's great!", vietnamese: "thật tuyệt vời!" }, { english: "I think so", vietnamese: "tôi nghĩ vậy" },
+        { english: "I don't think so", vietnamese: "tôi không nghĩ thế" }, { english: "really?", vietnamese: "thật sao?" }, { english: "what a pity!", vietnamese: "tiếc quá!" },
+        { english: "never mind", vietnamese: "không sao đâu" }, { english: "see you soon", vietnamese: "gặp lại sớm nhé" }, { english: "take care", vietnamese: "giữ gìn sức khỏe" },
+        { english: "good job", vietnamese: "làm tốt lắm" }, { english: "well done", vietnamese: "giỏi lắm" }, { english: "what's happening?", vietnamese: "chuyện gì đang xảy ra vậy?" },
+        { english: "what's wrong?", vietnamese: "có chuyện gì thế?" }, { english: "it's OK", vietnamese: "ổn mà" }, { english: "of course", vietnamese: "tất nhiên" },
+        { english: "I'm not sure", vietnamese: "tôi không chắc" }, { english: "I agree", vietnamese: "tôi đồng ý" }, { english: "I disagree", vietnamese: "tôi không đồng ý" },
+        { english: "maybe", vietnamese: "có thể" }, { english: "no problem", vietnamese: "không vấn đề gì" }, { english: "how about ...?", vietnamese: "còn ... thì sao?" },
+        { english: "what about ...?", vietnamese: "còn ... thì sao?" }, { english: "that's right", vietnamese: "đúng rồi" }, { english: "let's see", vietnamese: "để xem nào" },
+        { english: "that depends", vietnamese: "còn tùy" }, { english: "in my opinion", vietnamese: "theo ý kiến của tôi" }, { english: "I'd like to...", vietnamese: "tôi muốn..." },
+        { english: "I prefer to...", vietnamese: "tôi thích... hơn" }, { english: "I hope so", vietnamese: "tôi hy vọng vậy" }, { english: "I don't mind", vietnamese: "tôi không phiền" },
+        { english: "it's up to you", vietnamese: "tùy bạn" }, { english: "what do you mean?", vietnamese: "bạn có ý gì?" }, { english: "how interesting!", vietnamese: "thật thú vị!" },
+        { english: "that sounds great", vietnamese: "nghe hay đấy" }, { english: "I'm sorry to hear that", vietnamese: "tôi rất tiếc khi nghe vậy" },
+    ]
+  },
+  {
+    title: "LEARNING SKILLS",
+    words: [
+        { english: "learn", vietnamese: "học" }, { english: "study", vietnamese: "học tập" }, { english: "student", vietnamese: "học sinh" },
+        { english: "teacher", vietnamese: "giáo viên" }, { english: "subject", vietnamese: "môn học" }, { english: "class", vietnamese: "lớp học" },
+        { english: "classroom", vietnamese: "phòng học" }, { english: "school", vietnamese: "trường học" }, { english: "education", vietnamese: "giáo dục" },
+        { english: "lesson", vietnamese: "bài học" }, { english: "homework", vietnamese: "bài tập về nhà" }, { english: "exercise", vietnamese: "bài tập" },
+        { english: "task", vietnamese: "nhiệm vụ" }, { english: "instruction", vietnamese: "hướng dẫn" }, { english: "question", vietnamese: "câu hỏi" },
+        { english: "answer", vietnamese: "câu trả lời" }, { english: "example", vietnamese: "ví dụ" }, { english: "correct", vietnamese: "đúng" },
+        { english: "incorrect", vietnamese: "sai" }, { english: "mistake", vietnamese: "lỗi" }, { english: "check", vietnamese: "kiểm tra" },
+        { english: "test", vietnamese: "bài kiểm tra" }, { english: "exam", vietnamese: "kỳ thi" }, { english: "mark", vietnamese: "điểm" },
+        { english: "result", vietnamese: "kết quả" }, { english: "score", vietnamese: "điểm số" }, { english: "grade", vietnamese: "xếp loại" },
+        { english: "revise", vietnamese: "ôn tập" }, { english: "review", vietnamese: "xem lại, ôn lại" }, { english: "practice", vietnamese: "luyện tập" },
+        { english: "improve", vietnamese: "cải thiện" }, { english: "develop", vietnamese: "phát triển" }, { english: "succeed", vietnamese: "thành công" },
+        { english: "fail", vietnamese: "thất bại" }, { english: "try", vietnamese: "cố gắng" }, { english: "effort", vietnamese: "nỗ lực" },
+        { english: "pay attention", vietnamese: "chú ý" }, { english: "focus on", vietnamese: "tập trung vào" }, { english: "understand", vietnamese: "hiểu" },
+        { english: "explain", vietnamese: "giải thích" }, { english: "remember", vietnamese: "nhớ" }, { english: "forget", vietnamese: "quên" },
+        { english: "read", vietnamese: "đọc" }, { english: "read carefully", vietnamese: "đọc cẩn thận" }, { english: "listen", vietnamese: "nghe" },
+        { english: "listen carefully", vietnamese: "nghe kỹ" }, { english: "write", vietnamese: "viết" }, { english: "rewrite", vietnamese: "viết lại" },
+        { english: "speak", vietnamese: "nói" }, { english: "discuss", vietnamese: "thảo luận" }, { english: "share ideas", vietnamese: "chia sẻ ý tưởng" },
+        { english: "ask questions", vietnamese: "đặt câu hỏi" }, { english: "give answers", vietnamese: "đưa ra câu trả lời" }, { english: "give opinions", vietnamese: "nêu ý kiến" },
+        { english: "agree", vietnamese: "đồng ý" }, { english: "disagree", vietnamese: "không đồng ý" }, { english: "prepare", vietnamese: "chuẩn bị" },
+        { english: "presentation", vietnamese: "bài thuyết trình" }, { english: "report", vietnamese: "báo cáo" }, { english: "project", vietnamese: "dự án" },
+        { english: "group work", vietnamese: "làm việc nhóm" }, { english: "pair work", vietnamese: "làm việc theo cặp" }, { english: "teamwork", vietnamese: "làm việc nhóm" },
+        { english: "participate", vietnamese: "tham gia" }, { english: "take part in", vietnamese: "tham gia vào" }, { english: "volunteer", vietnamese: "tình nguyện" },
+        { english: "practice speaking", vietnamese: "luyện nói" }, { english: "practice listening", vietnamese: "luyện nghe" }, { english: "practice writing", vietnamese: "luyện viết" },
+        { english: "practice reading", vietnamese: "luyện đọc" }, { english: "note", vietnamese: "ghi chú" }, { english: "notebook", vietnamese: "vở ghi" },
+        { english: "dictionary", vietnamese: "từ điển" }, { english: "look up new words", vietnamese: "tra từ mới" }, { english: "underline", vietnamese: "gạch dưới" },
+        { english: "circle", vietnamese: "khoanh tròn" }, { english: "fill in", vietnamese: "điền vào" }, { english: "match", vietnamese: "nối" },
+        { english: "complete", vietnamese: "hoàn thành" }, { english: "choose", vietnamese: "chọn" }, { english: "find", vietnamese: "tìm" },
+        { english: "rearrange", vietnamese: "sắp xếp lại" }, { english: "translate", vietnamese: "dịch" }, { english: "use", vietnamese: "sử dụng" },
+        { english: "example sentence", vietnamese: "câu ví dụ" }, { english: "grammar rule", vietnamese: "quy tắc ngữ pháp" }, { english: "vocabulary list", vietnamese: "danh sách từ vựng" },
+        { english: "pronunciation", vietnamese: "phát âm" }, { english: "stress", vietnamese: "trọng âm" }, { english: "intonation", vietnamese: "ngữ điệu" },
+        { english: "repeat", vietnamese: "lặp lại" }, { english: "say aloud", vietnamese: "nói to lên" }, { english: "record your voice", vietnamese: "ghi âm giọng nói" },
+        { english: "listen again", vietnamese: "nghe lại" }, { english: "online learning", vietnamese: "học trực tuyến" }, { english: "offline learning", vietnamese: "học trực tiếp" },
+        { english: "e-learning", vietnamese: "học qua mạng" }, { english: "homework notebook", vietnamese: "vở bài tập" }, { english: "textbook", vietnamese: "sách giáo khoa" },
+        { english: "workbook", vietnamese: "sách bài tập" }, { english: "school bag", vietnamese: "cặp sách" }, { english: "bring books", vietnamese: "mang sách" },
+        { english: "use the Internet", vietnamese: "sử dụng Internet" }, { english: "download materials", vietnamese: "tải tài liệu" }, { english: "upload homework", vietnamese: "nộp bài tập" },
+        { english: "share files", vietnamese: "chia sẻ tệp" }, { english: "classroom rules", vietnamese: "nội quy lớp học" }, { english: "follow the rules", vietnamese: "tuân thủ nội quy" },
+        { english: "be on time", vietnamese: "đúng giờ" }, { english: "raise your hand", vietnamese: "giơ tay" }, { english: "ask for help", vietnamese: "nhờ giúp đỡ" },
+        { english: "help each other", vietnamese: "giúp đỡ nhau" }, { english: "be polite", vietnamese: "lịch sự" }, { english: "respect teachers", vietnamese: "tôn trọng giáo viên" },
+        { english: "cooperate", vietnamese: "hợp tác" }, { english: "be confident", vietnamese: "tự tin" }, { english: "don't be shy", vietnamese: "đừng ngại" },
+        { english: "be active", vietnamese: "năng động" }, { english: "make progress", vietnamese: "tiến bộ" }, { english: "do your best", vietnamese: "cố gắng hết sức" },
+        { english: "get good marks", vietnamese: "đạt điểm tốt" }, { english: "have a good result", vietnamese: "có kết quả tốt" }, { english: "improve pronunciation", vietnamese: "cải thiện phát âm" },
+        { english: "speak English every day", vietnamese: "nói tiếng Anh hàng ngày" }, { english: "learn by heart", vietnamese: "học thuộc lòng" }, { english: "take notes", vietnamese: "ghi chú bài" },
+        { english: "study hard", vietnamese: "học chăm chỉ" }, { english: "pay attention in class", vietnamese: "chú ý trong lớp" }, { english: "review lessons", vietnamese: "ôn lại bài học" },
+        { english: "ask the teacher", vietnamese: "hỏi giáo viên" }, { english: "discuss in groups", vietnamese: "thảo luận nhóm" }, { english: "share your ideas", vietnamese: "chia sẻ ý kiến của bạn" },
+        { english: "help classmates", vietnamese: "giúp bạn cùng lớp" }, { english: "encourage friends", vietnamese: "khích lệ bạn bè" }, { english: "prepare for exams", vietnamese: "chuẩn bị cho kỳ thi" },
+        { english: "finish homework on time", vietnamese: "làm bài tập đúng hạn" }, { english: "study timetable", vietnamese: "thời gian biểu học tập" }, { english: "goal", vietnamese: "mục tiêu" },
+        { english: "achieve goals", vietnamese: "đạt được mục tiêu" }, { english: "be proud of yourself", vietnamese: "tự hào về bản thân" },
+    ]
+  },
+];
+
+// --- Components ---
+
+const SpeakerIcon = () => (
+    React.createElement('svg', { 
+        xmlns: "http://www.w3.org/2000/svg", 
+        className: "h-8 w-8", 
+        fill: "none", 
+        viewBox: "0 0 24 24", 
+        stroke: "currentColor"
+    }, React.createElement('path', { 
+        strokeLinecap: "round", 
+        strokeLinejoin: "round", 
+        strokeWidth: 2, 
+        d: "M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" 
+    }))
+);
+
+const TrophyIcon = () => (
+    React.createElement('svg', { 
+        xmlns: "http://www.w3.org/2000/svg", 
+        className: "h-16 w-16", 
+        viewBox: "0 0 24 24", 
+        fill: "currentColor"
+    },
+    React.createElement('path', { d: "M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z" }),
+    React.createElement('path', { d: "M13 10V7h-2v3H8v2h3v3h2v-3h3v-2h-3z" }),
+    React.createElement('path', { d: "M12.486 16.293 10 15l-2.486 1.293.707-2.89-2.207-1.912 2.943-.225L10 8.5l1.043 2.766 2.943.225-2.207 1.912.707 2.89z", transform: "translate(-10 -9) scale(0.6) translate(15 15)" }),
+    React.createElement('path', { d: "M18.5 8h-1.42l-1.5-2h-7.16l-1.5 2H5.5c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h13c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2zm-10-1h4.94l.5 1h-5.94l.5-1zM18 18H6V11h12v7z" }))
+);
+
+
+const WrongAnswersModal = ({ isOpen, onClose, words }) => {
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    React.createElement('div', { 
+      className: "fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50",
+      onClick: onClose
+    },
+      React.createElement('div', { 
+        className: "bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col",
+        onClick: (e) => e.stopPropagation()
+      },
+        React.createElement('div', { className: "p-6 border-b border-gray-200 sticky top-0 bg-white" },
+          React.createElement('h2', { className: "text-2xl font-bold text-gray-800" }, "Words to Review"),
+          React.createElement('p', { className: "text-gray-500" }, "Here are the words you had trouble with.")
+        ),
+        React.createElement('div', { className: "p-6 overflow-y-auto" },
+          words.length === 0 ? 
+            React.createElement('p', { className: "text-center text-gray-500 py-8" }, "No mistakes yet. Great job!") :
+            React.createElement('ul', { className: "divide-y divide-gray-200" },
+              words.map((word, index) => (
+                React.createElement('li', { key: index, className: "py-3 flex justify-between items-center" },
+                  React.createElement('span', { className: "text-lg text-gray-800 font-medium" }, word.english),
+                  React.createElement('span', { className: "text-gray-600" }, word.vietnamese)
+                )
+              ))
+            )
+        ),
+        React.createElement('div', { className: "p-6 border-t border-gray-200 sticky bottom-0 bg-white" },
+          React.createElement('button', {
+            onClick: onClose,
+            className: "w-full p-3 bg-pink-500 text-white font-bold rounded-lg hover:bg-pink-600 transition-colors"
+          }, "Close")
+        )
+      )
+    )
+  );
+};
+
+const GameSummary = ({ score, total, onShowWrongAnswers, onNextTopic, onReturnToMenu }) => {
+    return (
+        React.createElement('div', { className: "flex flex-col items-center justify-center min-h-screen p-4" },
+            React.createElement('div', { className: "w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 text-center border border-gray-200" },
+                React.createElement('div', { className: "flex justify-center text-yellow-400 mb-4" },
+                    React.createElement(TrophyIcon)
+                ),
+                React.createElement('h1', { className: "text-3xl font-bold text-pink-600 mb-2" }, "Topic Complete!"),
+                React.createElement('p', { className: "text-gray-600 mb-6" }, "Great job! Here's how you did."),
+                
+                React.createElement('div', { className: "my-8" },
+                    React.createElement('p', { className: "text-lg text-gray-800" }, "Your Score"),
+                    React.createElement('p', { className: "text-6xl font-bold text-green-500" }, score, React.createElement('span', { className: "text-3xl text-gray-500" }, `/${total}`))
+                ),
+
+                React.createElement('div', { className: "space-y-3" },
+                    React.createElement('button', {
+                        onClick: onNextTopic,
+                        className: "w-full p-4 bg-pink-500 text-white font-bold rounded-lg hover:bg-pink-600 transition-transform hover:scale-105 transform duration-200"
+                    }, "Continue to Next Topic"),
+                    React.createElement('button', {
+                        onClick: onShowWrongAnswers,
+                        className: "w-full p-4 bg-gray-200 text-gray-800 font-bold rounded-lg hover:bg-gray-300 transition-transform hover:scale-105 transform duration-200"
+                    }, "Review Mistakes"),
+                    React.createElement('button', {
+                        onClick: onReturnToMenu,
+                        className: "w-full p-3 bg-transparent text-gray-600 font-bold rounded-lg hover:bg-gray-100 transition-colors"
+                    }, "Back to Main Menu")
+                )
+            )
+        )
+    );
+};
+
+const Game = ({ topic, onReturnToMenu, onNextTopic }) => {
+  const words = useMemo(() => [...topic.words].sort(() => 0.5 - Math.random()), [topic]);
+  
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [userInput, setUserInput] = useState('');
+  const [score, setScore] = useState(0);
+  const [attempts, setAttempts] = useState(1);
+  const [wrongAnswers, setWrongAnswers] = useState([]);
+  const [isFinished, setIsFinished] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const [isHintVisible, setIsHintVisible] = useState(false);
+  const [showWrongAnswersModal, setShowWrongAnswersModal] = useState(false);
+  const [feedback, setFeedback] = useState(null);
+  const inputRef = useRef(null);
+
+  const currentWord = words[currentWordIndex];
+
+  const speak = useCallback((text) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      window.speechSynthesis.speak(utterance);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (currentWord) {
+      speak(currentWord.english);
+       if(inputRef.current) {
+         inputRef.current.focus();
+       }
+    }
+  }, [currentWord, speak]);
+
+  useEffect(() => {
+      if (feedback) {
+          const timer = setTimeout(() => setFeedback(null), 1500);
+          return () => clearTimeout(timer);
+      }
+  }, [feedback]);
+
+  const handleNextWord = useCallback(() => {
+    if (currentWordIndex < words.length - 1) {
+      setCurrentWordIndex(prev => prev + 1);
+      setUserInput('');
+      setAttempts(1);
+      setShowHint(false);
+      setFeedback(null);
+    } else {
+      setIsFinished(true);
+    }
+  }, [currentWordIndex, words.length]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!userInput.trim() || feedback) return;
+
+    const isCorrect = userInput.trim().toLowerCase() === currentWord.english.toLowerCase();
+
+    if (isCorrect) {
+      setFeedback({type: 'correct', message: 'Correct!'});
+      if (attempts === 1) {
+        setScore(prev => prev + 1);
+      }
+      setTimeout(handleNextWord, 1000);
+    } else {
+      setFeedback({type: 'incorrect', message: 'Incorrect, try again!'});
+      if (attempts === 1) {
+          setWrongAnswers(prev => [...prev, currentWord]);
+      }
+      setAttempts(prev => prev + 1);
+      if (attempts >= 1) {
+        setShowHint(true);
+      }
+    }
+  };
+
+  if (isFinished) {
+    return React.createElement(GameSummary, { score: score, total: words.length, onShowWrongAnswers: () => setShowWrongAnswersModal(true), onNextTopic: onNextTopic, onReturnToMenu: onReturnToMenu });
+  }
+
+  if (!currentWord) {
+    return React.createElement('div', { className: "text-center p-8" }, "Loading topic...");
+  }
+  
+  const getInputBorderColor = () => {
+      if (!feedback) return 'border-gray-300 focus:border-pink-500';
+      return feedback.type === 'correct' ? 'border-green-500 animate-pulse' : 'border-red-500 animate-pulse';
+  }
+
+  const progressPercentage = ((currentWordIndex) / words.length) * 100;
+
+  return (
+    React.createElement('div', { className: "flex flex-col items-center justify-center min-h-screen p-4" },
+      React.createElement('div', { className: "w-full max-w-xl bg-white rounded-2xl shadow-2xl p-6 md:p-8 relative overflow-hidden border border-gray-200" },
+        React.createElement('div', { className: "w-full bg-gray-200 rounded-full h-2.5 absolute top-0 left-0" },
+            React.createElement('div', { className: "bg-pink-400 h-2.5 rounded-full", style: { width: `${progressPercentage}%`, transition: 'width 0.5s ease-in-out' } })
+        ),
+        React.createElement('div', { className: "absolute top-4 left-4" },
+            React.createElement('button', { onClick: onReturnToMenu, className: "text-gray-500 hover:text-pink-600 transition-colors text-sm" }, "← Change Topic")
+        ),
+        React.createElement('div', { className: "absolute top-4 right-4" },
+            React.createElement('button', { onClick: () => setShowWrongAnswersModal(true), className: "text-gray-500 hover:text-pink-600 transition-colors text-sm" }, `Mistakes (${wrongAnswers.length})`)
+        ),
+        React.createElement('div', { className: "text-center mt-12" },
+            React.createElement('h2', { className: "text-2xl font-bold text-pink-600 mb-2" }, topic.title),
+            React.createElement('p', { className: "text-gray-500" }, `Word ${currentWordIndex + 1} of ${words.length} • Score: ${score}`)
+        ),
+        React.createElement('div', { className: "my-8 text-center" },
+            React.createElement('p', { className: "text-4xl md:text-5xl font-semibold text-gray-900 mb-2" }, currentWord.vietnamese),
+            React.createElement('button', { onClick: () => speak(currentWord.english), className: "text-gray-500 hover:text-pink-500 transition-colors p-2 rounded-full active:scale-90 transform" },
+                React.createElement(SpeakerIcon)
+            )
+        ),
+        React.createElement('form', { onSubmit: handleSubmit, className: "space-y-4" },
+            React.createElement('input', {
+                ref: inputRef,
+                type: "text",
+                value: userInput,
+                onChange: (e) => setUserInput(e.target.value),
+                placeholder: "Type the English word...",
+                className: `w-full p-4 text-center text-lg bg-gray-100 border-2 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all duration-200 ${getInputBorderColor()}`,
+                autoCapitalize: "none",
+                autoComplete: "off",
+                autoCorrect: "off"
+            }),
+            React.createElement('button', { type: "submit", className: "w-full p-4 bg-pink-500 text-white font-bold rounded-lg hover:bg-pink-600 transition-transform hover:scale-105 transform duration-200 disabled:bg-gray-200 disabled:cursor-not-allowed disabled:scale-100" },
+                "Submit"
+            )
+        ),
+        React.createElement('div', { className: "mt-4 h-12 flex items-center justify-center" },
+            showHint && !feedback && (
+                React.createElement('div', { className: "relative" },
+                    React.createElement('button', {
+                        onMouseDown: () => setIsHintVisible(true),
+                        onMouseUp: () => setIsHintVisible(false),
+                        onTouchStart: () => setIsHintVisible(true),
+                        onTouchEnd: () => setIsHintVisible(false),
+                        className: "px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
+                    }, "Hold for Hint"),
+                    isHintVisible && (
+                        React.createElement('div', { className: "absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white p-3 rounded-lg border border-gray-300 shadow-lg z-10" },
+                            React.createElement('p', { className: "text-amber-700 font-mono whitespace-nowrap" }, currentWord.english)
+                        )
+                    )
+                )
+            ),
+             feedback && (
+                React.createElement('p', { className: `text-lg font-semibold ${feedback.type === 'correct' ? 'text-green-500' : 'text-red-500'}` },
+                    feedback.message
+                )
+            )
+        )
+      ),
+      React.createElement(WrongAnswersModal, {
+        isOpen: showWrongAnswersModal,
+        onClose: () => setShowWrongAnswersModal(false),
+        words: wrongAnswers
+      })
+    )
+  );
+};
+
+
+const WelcomeScreen = ({ onNameSubmit }) => {
+    const [name, setName] = useState('');
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (name.trim()) {
+            onNameSubmit(name.trim());
+        }
+    };
+
+    return (
+        React.createElement('div', { className: "flex flex-col items-center justify-center min-h-screen p-4 text-center" },
+            React.createElement('div', { className: "w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 border border-gray-200" },
+                React.createElement('h1', { className: "text-4xl font-bold text-pink-600 mb-2" }, "Vocabulary Challenge"),
+                React.createElement('p', { className: "text-gray-600 mb-8" }, "Enter your name to start learning!"),
+                React.createElement('form', { onSubmit: handleSubmit, className: "flex flex-col gap-4" },
+                    React.createElement('input', {
+                        type: "text",
+                        value: name,
+                        onChange: (e) => setName(e.target.value),
+                        placeholder: "Your Name",
+                        className: "w-full p-4 text-center text-lg bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200",
+                        maxLength: 20
+                    }),
+                    React.createElement('button', {
+                        type: "submit",
+                        disabled: !name.trim(),
+                        className: "w-full p-4 bg-pink-500 text-white font-bold rounded-lg hover:bg-pink-600 transition-transform hover:scale-105 transform duration-200 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:scale-100"
+                    }, "Start Learning")
+                )
+            )
+        )
+    );
+};
+
+const topicColors = [
+  'bg-red-100 border-red-300 hover:bg-red-200 text-red-800 focus:ring-red-500',
+  'bg-orange-100 border-orange-300 hover:bg-orange-200 text-orange-800 focus:ring-orange-500',
+  'bg-amber-100 border-amber-300 hover:bg-amber-200 text-amber-800 focus:ring-amber-500',
+  'bg-yellow-100 border-yellow-300 hover:bg-yellow-200 text-yellow-800 focus:ring-yellow-500',
+  'bg-lime-100 border-lime-300 hover:bg-lime-200 text-lime-800 focus:ring-lime-500',
+  'bg-green-100 border-green-300 hover:bg-green-200 text-green-800 focus:ring-green-500',
+  'bg-emerald-100 border-emerald-300 hover:bg-emerald-200 text-emerald-800 focus:ring-emerald-500',
+  'bg-teal-100 border-teal-300 hover:bg-teal-200 text-teal-800 focus:ring-teal-500',
+  'bg-cyan-100 border-cyan-300 hover:bg-cyan-200 text-cyan-800 focus:ring-cyan-500',
+  'bg-sky-100 border-sky-300 hover:bg-sky-200 text-sky-800 focus:ring-sky-500',
+];
+
+const TopicSelector = ({ playerName, onSelectTopic }) => {
+  return (
+    React.createElement('div', { className: "flex flex-col items-center justify-center min-h-screen p-4" },
+        React.createElement('div', { className: "w-full max-w-3xl text-center" },
+            React.createElement('h1', { className: "text-3xl md:text-4xl font-bold text-gray-800 mb-2" }, `Welcome, ${playerName}!`),
+            React.createElement('p', { className: "text-lg text-gray-600 mb-8" }, "Choose a topic to begin your challenge."),
+            React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 gap-4" },
+                vocabularyData.map((topic, index) => (
+                    React.createElement('button', {
+                        key: index,
+                        onClick: () => onSelectTopic(topic),
+                        className: `p-6 rounded-lg shadow-md border hover:scale-105 transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-opacity-75 ${topicColors[index % topicColors.length]}`
+                    },
+                        React.createElement('h2', { className: "text-xl font-semibold" }, topic.title),
+                        React.createElement('p', { className: "mt-1 opacity-80" }, `${topic.words.length} words`)
+                    )
+                ))
+            )
+        )
+    )
+  );
+};
+
+
+const App = () => {
+  const [playerName, setPlayerName] = useState('');
+  const [currentTopic, setCurrentTopic] = useState(null);
+  const [topicIndex, setTopicIndex] = useState(null);
+
+  const handleNameSubmit = useCallback((name) => {
+    setPlayerName(name);
+  }, []);
+
+  const handleSelectTopic = useCallback((topic) => {
+    const index = vocabularyData.findIndex(t => t.title === topic.title);
+    setCurrentTopic(topic);
+    setTopicIndex(index);
+  }, []);
+  
+  const handleReturnToMenu = useCallback(() => {
+      setCurrentTopic(null);
+      setTopicIndex(null);
+  }, []);
+
+  const handleNextTopic = useCallback(() => {
+    if (topicIndex !== null && topicIndex < vocabularyData.length - 1) {
+        const nextIndex = topicIndex + 1;
+        setCurrentTopic(vocabularyData[nextIndex]);
+        setTopicIndex(nextIndex);
+    } else {
+        handleReturnToMenu();
+    }
+  }, [topicIndex, handleReturnToMenu]);
+
+  if (!playerName) {
+    return React.createElement(WelcomeScreen, { onNameSubmit: handleNameSubmit });
+  }
+
+  if (!currentTopic) {
+    return React.createElement(TopicSelector, { playerName: playerName, onSelectTopic: handleSelectTopic });
+  }
+
+  return (
+    React.createElement(Game, { 
+        topic: currentTopic, 
+        onReturnToMenu: handleReturnToMenu, 
+        onNextTopic: handleNextTopic 
+    })
+  );
+};
+
+// --- Mount the application ---
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error("Could not find root element to mount to");
+}
+
+const root = ReactDOM.createRoot(rootElement);
+root.render(
+  React.createElement(React.StrictMode, null, 
+    React.createElement(App)
+  )
+);
+</script>
+  </body>
+</html>
