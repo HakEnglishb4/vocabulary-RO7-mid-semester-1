@@ -1,11 +1,9 @@
-
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-const { useState, useEffect, useMemo, useCallback, useRef } = React;
+const { useState, useCallback, useEffect, useMemo, useRef } = React;
 
-// Data from services/vocabulary.ts
+// From services/vocabulary.ts
 const vocabularyData = [
     {
         title: "1.1: People and Relationships",
@@ -512,7 +510,7 @@ const vocabularyData = [
             { english: "ice tea", vietnamese: "trà đá", englishExample: "Ice tea is popular in Vietnam.", vietnameseExample: "Trà đá rất phổ biến ở Việt Nam." },
             { english: "bottle of water", vietnamese: "chai nước", englishExample: "Please bring me a bottle of water.", vietnameseExample: "Làm ơn mang cho tôi một chai nước." },
             { english: "cup of coffee", vietnamese: "tách cà phê", englishExample: "He drinks a cup of coffee every morning.", vietnameseExample: "Cậu ấy uống một tách cà phê mỗi sáng." },
-            { english: "glass of milk", vietnamese: "ly sữa", englishExample: "The baby drinks a glass of milk before bed.", vietnameseExample: "Em bé uống một ly sữa trước khi ngủ." },
+            { english: "glass of milk", vietnamese: "ly sữa", englishExample: "The baby drinks a glass of milk before bed.", vietnameseExample: "Em bé uống một ly sữa trước khi đi ngủ." },
             { english: "can of soda", vietnamese: "lon nước ngọt", englishExample: "I bought a can of soda from the shop.", vietnameseExample: "Tôi mua một lon nước ngọt ở cửa hàng." },
             { english: "drink", vietnamese: "đồ uống / uống", englishExample: "What would you like to drink?", vietnameseExample: "Bạn muốn uống gì?" },
             { english: "thirsty", vietnamese: "khát nước", englishExample: "I'm thirsty. Can I have some water?", vietnameseExample: "Tôi khát. Cho tôi ít nước được không?" }
@@ -920,14 +918,12 @@ const vocabularyData = [
     }
 ];
 
-// Components from components/
-const SpeakerIcon = () => React.createElement(
-  "svg",
-  {
+// From components/Icons.tsx
+const SpeakerIcon = ({ className = "h-8 w-8" }) => (
+  React.createElement("svg", {
     xmlns: "http://www.w3.org/2000/svg",
-    className: "h-8 w-8",
+    className: className,
     fill: "none",
-    // FIX: Corrected typo 'viewBix' to 'viewBox' for the SVG element.
     viewBox: "0 0 24 24",
     stroke: "currentColor"
   },
@@ -936,157 +932,123 @@ const SpeakerIcon = () => React.createElement(
     strokeLinejoin: "round",
     strokeWidth: 2,
     d: "M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
-  })
+  }))
 );
 
-const TrophyIcon = () => React.createElement(
-  "svg",
-  {
+const TrophyIcon = () => (
+  React.createElement("svg", {
     xmlns: "http://www.w3.org/2000/svg",
     className: "h-16 w-16",
     viewBox: "0 0 20 20",
     fill: "currentColor"
   },
-  React.createElement("path", { d: "M17.92,3.39a1,1,0,0,0-1.33-.22L12,6.1,7.41,3.17a1,1,0,0,0-1.33.22L2.1,9.45a1,1,0,0,0,0,1.1l2.1,6.28a1,1,0,0,0,1,.67H14.8a1,1,0,0,0,1-.67l2.1-6.28a1,1,0,0,0,0-1.1ZM13,16H7L5.5,12,3,9.4,4.5,7.4l3,2.25a1,1,0,0,0,1,0l3-2.25L13,9.4,14.5,12Z" })
+  React.createElement("path", { d: "M17.92,3.39a1,1,0,0,0-1.33-.22L12,6.1,7.41,3.17a1,1,0,0,0-1.33.22L2.1,9.45a1,1,0,0,0,0,1.1l2.1,6.28a1,1,0,0,0,1,.67H14.8a1,1,0,0,0,1-.67l2.1-6.28a1,1,0,0,0,0-1.1ZM13,16H7L5.5,12,3,9.4,4.5,7.4l3,2.25a1,1,0,0,0,1,0l3-2.25L13,9.4,14.5,12Z" }))
 );
 
+const PlayIcon = ({className = "h-5 w-5"}) => (
+  React.createElement("svg", {
+    xmlns: "http://www.w3.org/2000/svg",
+    className: className,
+    viewBox: "0 0 20 20",
+    fill: "currentColor"
+  },
+  React.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z", clipRule: "evenodd" }))
+);
+
+const ChevronDownIcon = ({className = "h-5 w-5"}) => (
+    React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", className: className, viewBox: "0 0 20 20", fill: "currentColor" },
+        React.createElement("path", { fillRule: "evenodd", d: "M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z", clipRule: "evenodd" })
+    )
+);
+
+// From components/WrongAnswersModal.tsx
 const WrongAnswersModal = ({ isOpen, onClose, mistakes, onPracticeMistakes }) => {
   if (!isOpen) {
     return null;
   }
 
-  return React.createElement(
-    "div",
-    {
+  return (
+    React.createElement("div", {
       className: "fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50",
       onClick: onClose
     },
-    React.createElement(
-      "div",
-      {
-        className: "bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col",
-        onClick: (e) => e.stopPropagation()
-      },
-      React.createElement(
-        "div",
-        { className: "p-6 border-b border-gray-200 sticky top-0 bg-white" },
-        React.createElement("h2", { className: "text-2xl font-bold text-gray-800" }, "Words to Review"),
-        React.createElement("p", { className: "text-gray-500" }, "Here are the words you had trouble with.")
-      ),
-      React.createElement(
-        "div",
-        { className: "p-6 overflow-y-auto" },
-        mistakes.length === 0
-          ? React.createElement("p", { className: "text-center text-gray-500 py-8" }, "No mistakes yet. Great job!")
-          : React.createElement(
-              "ul",
-              { className: "divide-y divide-gray-200" },
-              // FIX: Spread the result of mistakes.map to pass each list item as a separate child argument to React.createElement. This resolves a TypeScript type inference issue where passing an array as a single child argument was causing an error.
-              ...mistakes.map((mistake, index) =>
-                React.createElement(
-                  "li",
-                  {
-                    key: index,
-                    className: "py-4 flex flex-col items-start select-none",
-                    onContextMenu: (e) => e.preventDefault(),
-                  },
-                  React.createElement(
-                    "div",
-                    {
-                      key: "word",
-                      className: "flex justify-between items-center w-full",
-                    },
-                    React.createElement(
-                      "span",
-                      { className: "text-lg text-gray-800 font-medium" },
-                      mistake.word.english
-                    ),
-                    React.createElement(
-                      "span",
-                      { className: "text-gray-600" },
-                      mistake.word.vietnamese
-                    )
-                  ),
-                  mistake.sentenceErrorCount > 0
-                    ? React.createElement(
-                        "p",
-                        {
-                          key: "sentence-error",
-                          className: "text-sm font-semibold text-red-600 mt-1",
-                        },
-                        `Sentence mistakes: ${mistake.sentenceErrorCount}`
-                      )
-                    : null,
-                  mistake.word.englishExample
-                    ? React.createElement(
-                        "p",
-                        {
-                          key: "example",
-                          className: "text-xl text-gray-500 mt-1 italic",
-                        },
-                        `e.g., "${mistake.word.englishExample}"`
-                      )
-                    : null
-                )
-              )
-            )
-      ),
-      React.createElement(
-        "div",
-        { className: "p-6 border-t border-gray-200 sticky bottom-0 bg-white space-y-2" },
-         React.createElement(
-          "button",
-          {
-            onClick: onPracticeMistakes,
-            disabled: mistakes.length === 0,
-            className: "w-full p-3 bg-amber-500 text-white font-bold rounded-lg hover:bg-amber-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-          },
-          `Practice Mistakes (${mistakes.length})`
+    React.createElement("div", {
+      className: "bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col",
+      onClick: (e) => e.stopPropagation()
+    },
+    React.createElement("div", { className: "p-6 border-b border-gray-200 sticky top-0 bg-white" },
+      React.createElement("h2", { className: "text-2xl font-bold text-gray-800" }, "Words to Review"),
+      React.createElement("p", { className: "text-gray-500" }, "Here are the words you had trouble with.")
+    ),
+    React.createElement("div", { className: "p-6 overflow-y-auto" },
+      mistakes.length === 0 ? (
+        React.createElement("p", { className: "text-center text-gray-500 py-8" }, "No mistakes yet. Great job!")
+      ) : (
+        React.createElement("ul", { className: "divide-y divide-gray-200" },
+          mistakes.map((mistake, index) => (
+            React.createElement("li", {
+              key: index,
+              className: "py-4 flex flex-col items-start select-none",
+              onContextMenu: (e) => e.preventDefault()
+            },
+            React.createElement("div", { className: "flex justify-between items-center w-full" },
+              React.createElement("span", { className: "text-lg text-gray-800 font-medium" }, mistake.word.english),
+              React.createElement("span", { className: "text-gray-600" }, mistake.word.vietnamese)
+            ),
+            mistake.sentenceErrorCount > 0 && (
+              React.createElement("p", { className: "text-sm font-semibold text-red-600 mt-1" }, `Sentence mistakes: ${mistake.sentenceErrorCount}`)
+            ),
+            mistake.word.englishExample && (
+              React.createElement("p", { className: "text-base text-gray-500 mt-1 italic" }, `e.g., "${mistake.word.englishExample}"`)
+            ))
+          ))
+        )
+      )
+    ),
+    React.createElement("div", { className: "p-6 border-t border-gray-200 sticky bottom-0 bg-white space-y-2" },
+      React.createElement("button", {
+        onClick: onPracticeMistakes,
+        disabled: mistakes.length === 0,
+        className: "w-full p-3 bg-amber-500 text-white font-bold rounded-lg hover:bg-amber-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+      }, `Practice Mistakes (${mistakes.length})`),
+      React.createElement("button", {
+        onClick: onClose,
+        className: "w-full p-3 bg-sky-500 text-white font-bold rounded-lg hover:bg-sky-600 transition-colors"
+      }, "Close")
+    )))
+  );
+};
+
+// From components/GameSummary.tsx
+const GameSummary = ({ score, total, onShowWrongAnswers, onNextTopic, onReturnToMenu, onPracticeMistakes, mistakesCount }) => {
+  return (
+    React.createElement("div", { className: "flex flex-col items-center justify-center min-h-screen p-4" },
+      React.createElement("div", { className: "w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 text-center border border-gray-200" },
+        React.createElement("div", { className: "flex justify-center text-sky-400 mb-4" },
+          React.createElement(TrophyIcon)
         ),
-        React.createElement(
-          "button",
-          {
-            onClick: onClose,
-            className: "w-full p-3 bg-sky-500 text-white font-bold rounded-lg hover:bg-sky-600 transition-colors"
-          },
-          "Close"
+        React.createElement("h1", { className: "text-3xl font-bold text-sky-600 mb-2" }, "Topic Complete!"),
+        React.createElement("p", { className: "text-gray-600 mb-6" }, "Great job! Here's how you did."),
+        React.createElement("div", { className: "my-8" },
+          React.createElement("p", { className: "text-lg text-gray-800" }, "Your Score"),
+          React.createElement("p", { className: "text-6xl font-bold text-green-500" },
+            score,
+            React.createElement("span", { className: "text-3xl text-gray-500" }, `/${total}`)
+          )
+        ),
+        React.createElement("div", { className: "space-y-3" },
+          React.createElement("button", { onClick: onNextTopic, className: "w-full p-4 bg-sky-500 text-white font-bold rounded-lg hover:bg-sky-600 transition-transform hover:scale-105 transform duration-200" }, "Continue to Next Topic"),
+          mistakesCount > 0 && React.createElement("button", { onClick: onPracticeMistakes, className: "w-full p-4 bg-amber-500 text-white font-bold rounded-lg hover:bg-amber-600 transition-transform hover:scale-105 transform duration-200" }, `Practice ${mistakesCount} Mistake(s)`),
+          React.createElement("button", { onClick: onShowWrongAnswers, className: "w-full p-4 bg-gray-200 text-gray-800 font-bold rounded-lg hover:bg-gray-300 transition-transform hover:scale-105 transform duration-200" }, "Review Mistakes"),
+          React.createElement("button", { onClick: onReturnToMenu, className: "w-full p-3 bg-transparent text-gray-600 font-bold rounded-lg hover:bg-gray-100 transition-colors" }, "Back to Main Menu")
         )
       )
     )
   );
 };
 
-const GameSummary = ({ score, total, onShowWrongAnswers, onNextTopic, onReturnToMenu, onPracticeMistakes, mistakesCount }) => {
-  return React.createElement(
-    "div",
-    { className: "flex flex-col items-center justify-center min-h-screen p-4" },
-    React.createElement(
-      "div",
-      { className: "w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 text-center border border-gray-200" },
-      React.createElement(
-        "div", { className: "flex justify-center text-sky-400 mb-4" },
-        React.createElement(TrophyIcon)
-      ),
-      React.createElement("h1", { className: "text-3xl font-bold text-sky-600 mb-2" }, "Topic Complete!"),
-      React.createElement("p", { className: "text-gray-600 mb-6" }, "Great job! Here's how you did."),
-      React.createElement(
-        "div", { className: "my-8" },
-        React.createElement("p", { className: "text-lg text-gray-800" }, "Your Score"),
-        React.createElement("p", { className: "text-6xl font-bold text-green-500" }, score, React.createElement("span", { className: "text-3xl text-gray-500" }, `/${total}`))
-      ),
-      React.createElement(
-        "div", { className: "space-y-3" },
-        React.createElement("button", { onClick: onNextTopic, className: "w-full p-4 bg-sky-500 text-white font-bold rounded-lg hover:bg-sky-600 transition-transform hover:scale-105 transform duration-200" }, "Continue to Next Topic"),
-        // FIX: Replaced `&&` operator with a ternary operator to prevent TypeScript from inferring a boolean type for the React child, which can cause overload resolution errors.
-        mistakesCount > 0 ? React.createElement("button", { onClick: onPracticeMistakes, className: "w-full p-4 bg-amber-500 text-white font-bold rounded-lg hover:bg-amber-600 transition-transform hover:scale-105 transform duration-200" }, `Practice ${mistakesCount} Mistake(s)`) : null,
-        React.createElement("button", { onClick: onShowWrongAnswers, className: "w-full p-4 bg-gray-200 text-gray-800 font-bold rounded-lg hover:bg-gray-300 transition-transform hover:scale-105 transform duration-200" }, "Review Mistakes"),
-        React.createElement("button", { onClick: onReturnToMenu, className: "w-full p-3 bg-transparent text-gray-600 font-bold rounded-lg hover:bg-gray-100 transition-colors" }, "Back to Main Menu")
-      )
-    )
-  );
-};
-
-const Game = ({ topic, onReturnToMenu, onNextTopic, onStartPractice }) => {
+// From components/Game.tsx
+const Game = ({ topic, onReturnToMenu, onNextTopic, onStartPractice, selectedVoiceURI }) => {
   const words = useMemo(() => [...topic.words].sort(() => 0.5 - Math.random()), [topic]);
   
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
@@ -1108,15 +1070,26 @@ const Game = ({ topic, onReturnToMenu, onNextTopic, onStartPractice }) => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      if (onEndCallback && typeof onEndCallback === 'function') {
+      
+      if (selectedVoiceURI) {
+        const allVoices = window.speechSynthesis.getVoices();
+        const selectedVoice = allVoices.find(voice => voice.voiceURI === selectedVoiceURI);
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+            utterance.lang = selectedVoice.lang;
+        }
+      } else {
+        utterance.lang = 'en-US';
+      }
+
+      if (onEndCallback) {
         utterance.onend = onEndCallback;
       }
       window.speechSynthesis.speak(utterance);
-    } else if (onEndCallback && typeof onEndCallback === 'function') {
+    } else if (onEndCallback) {
       onEndCallback();
     }
-  }, []);
+  }, [selectedVoiceURI]);
 
   useEffect(() => {
     if (currentWord) {
@@ -1127,13 +1100,13 @@ const Game = ({ topic, onReturnToMenu, onNextTopic, onStartPractice }) => {
         const playSecondTimeAndHide = () => {
           speak(textToSpeak, () => {
             setIsPreviewVisible(false);
-            if (inputRef.current) inputRef.current.focus();
+            inputRef.current?.focus();
           });
         };
         speak(textToSpeak, playSecondTimeAndHide);
       } else {
         setIsPreviewVisible(false);
-        if (inputRef.current) inputRef.current.focus();
+        inputRef.current?.focus();
       }
     }
     return () => {
@@ -1166,7 +1139,7 @@ const Game = ({ topic, onReturnToMenu, onNextTopic, onStartPractice }) => {
   }, [currentWordIndex, words.length]);
   
   const handleTransitionToSentence = useCallback(() => {
-    if (currentWord.englishExample) {
+    if (currentWord?.englishExample) {
         setGameStage('sentence');
         setUserInput('');
         setFeedback(null);
@@ -1179,7 +1152,7 @@ const Game = ({ topic, onReturnToMenu, onNextTopic, onStartPractice }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!userInput.trim() || feedback) return;
+    if (!userInput.trim() || feedback || !currentWord) return;
 
     if (gameStage === 'word') {
         const isCorrect = normalizeSentence(userInput) === normalizeSentence(currentWord.english);
@@ -1232,30 +1205,31 @@ const Game = ({ topic, onReturnToMenu, onNextTopic, onStartPractice }) => {
   };
 
   const handleListenAgain = useCallback(() => {
+      if (!currentWord) return;
       const textToSpeak = gameStage === 'word' ? currentWord.english : (currentWord.englishExample || '');
       if (textToSpeak) {
           setIsPreviewVisible(true);
           speak(textToSpeak, () => {
               setIsPreviewVisible(false);
-              if (inputRef.current) inputRef.current.focus();
+              inputRef.current?.focus();
           });
       }
   }, [currentWord, gameStage, speak]);
 
   const handlePracticeMistakes = () => {
     if (wrongAnswers.length > 0) {
-      setShowWrongAnswersModal(false); // Close modal if it's open
+      setShowWrongAnswersModal(false);
       onStartPractice(wrongAnswers);
     }
   };
 
   if (isFinished) {
     return React.createElement(GameSummary, { 
-      score, 
+      score: score,
       total: words.length, 
       onShowWrongAnswers: () => setShowWrongAnswersModal(true), 
-      onNextTopic, 
-      onReturnToMenu,
+      onNextTopic: onNextTopic, 
+      onReturnToMenu: onReturnToMenu,
       onPracticeMistakes: handlePracticeMistakes,
       mistakesCount: wrongAnswers.length 
     });
@@ -1267,121 +1241,110 @@ const Game = ({ topic, onReturnToMenu, onNextTopic, onStartPractice }) => {
   
   const getInputBorderColor = () => {
       if (!feedback) return 'border-gray-300 focus:border-sky-500';
-      return feedback.type === 'correct' ? 'border-green-500 animate-pulse' : 'border-red-500 animate-pulse';
+      return feedback.type === 'correct' ? 'border-green-500 animate-pulse-correct' : 'border-red-500 animate-pulse-incorrect';
   }
 
   const progressPercentage = ((currentWordIndex) / words.length) * 100;
 
-  return React.createElement(
-    "div", { className: "flex flex-col items-center justify-center min-h-screen p-4" },
-    React.createElement(
-      "div", { className: "w-full max-w-xl bg-white rounded-2xl shadow-2xl p-6 md:p-8 relative overflow-hidden border border-gray-200" },
-      React.createElement("div", { className: "w-full bg-gray-200 rounded-full h-2.5 absolute top-0 left-0" },
-        React.createElement("div", { className: "bg-sky-400 h-2.5 rounded-full", style: { width: `${progressPercentage}%`, transition: 'width 0.5s ease-in-out' } })
-      ),
-      React.createElement("div", { className: "absolute top-4 left-4" },
-        React.createElement("button", { onClick: onReturnToMenu, className: "text-gray-500 hover:text-sky-600 transition-colors text-sm" }, "← Change Topic")
-      ),
-      React.createElement("div", { className: "absolute top-4 right-4" },
-        React.createElement("button", { onClick: () => setShowWrongAnswersModal(true), className: "text-gray-500 hover:text-sky-600 transition-colors text-sm" }, `Mistakes (${wrongAnswers.length})`)
-      ),
-      React.createElement("div", { className: "text-center mt-12" },
-        React.createElement("h2", { className: "text-2xl font-bold text-sky-600 mb-2" }, topic.title),
-        React.createElement("p", { className: "text-gray-500" }, `Word ${currentWordIndex + 1} of ${words.length} • Score: ${score}`)
-      ),
-      React.createElement("div", { className: "my-8 text-center min-h-[160px] flex flex-col justify-center items-center select-none", onContextMenu: (e) => e.preventDefault() },
-        isPreviewVisible
-          ? ( gameStage === 'word'
-              ? React.createElement(React.Fragment, null,
-                  React.createElement("p", { className: "text-4xl md:text-5xl font-semibold text-sky-700 mb-2 animate-pulse" }, currentWord.english),
-                  React.createElement("p", { className: "text-lg text-gray-500" }, `(${currentWord.vietnamese})`)
-                )
-              : React.createElement(React.Fragment, null,
-                  React.createElement("p", { className: "text-2xl text-sky-700 mb-2 italic animate-pulse" }, `"${currentWord.englishExample}"`),
-                  React.createElement("p", { className: "text-lg text-gray-500" }, `(${currentWord.vietnameseExample})`)
-                )
+  return (
+    React.createElement("div", { className: "flex flex-col items-center justify-center min-h-screen p-4" },
+      React.createElement("div", { className: "w-full max-w-xl bg-white rounded-2xl shadow-2xl p-6 md:p-8 relative overflow-hidden border border-gray-200" },
+        React.createElement("div", { className: "w-full bg-gray-200 rounded-full h-2.5 absolute top-0 left-0" },
+          React.createElement("div", { className: "bg-sky-400 h-2.5 rounded-full", style: { width: `${progressPercentage}%`, transition: 'width 0.5s ease-in-out' } })
+        ),
+        React.createElement("div", { className: "absolute top-4 left-4" },
+          React.createElement("button", { onClick: onReturnToMenu, className: "text-gray-500 hover:text-sky-600 transition-colors text-sm" }, "← Change Topic")
+        ),
+        React.createElement("div", { className: "absolute top-4 right-4" },
+          React.createElement("button", { onClick: () => setShowWrongAnswersModal(true), className: "text-gray-500 hover:text-sky-600 transition-colors text-sm" }, `Mistakes (${wrongAnswers.length})`)
+        ),
+        React.createElement("div", { className: "text-center mt-12" },
+          React.createElement("h2", { className: "text-2xl font-bold text-sky-600 mb-2" }, topic.title),
+          React.createElement("p", { className: "text-gray-500" }, `Word ${currentWordIndex + 1} of ${words.length} • Score: ${score}`)
+        ),
+        React.createElement("div", { className: "my-8 text-center min-h-[160px] flex flex-col justify-center items-center select-none", onContextMenu: (e) => e.preventDefault() },
+          isPreviewVisible ? (
+            gameStage === 'word' ? (
+              React.createElement(React.Fragment, null,
+                React.createElement("p", { className: "text-4xl md:text-5xl font-semibold text-sky-700 mb-2 animate-pulse" }, currentWord.english),
+                React.createElement("p", { className: "text-lg text-gray-500" }, `(${currentWord.vietnamese})`)
+              )
+            ) : (
+              React.createElement(React.Fragment, null,
+                React.createElement("p", { className: "text-2xl text-sky-700 mb-2 italic animate-pulse" }, `"${currentWord.englishExample}"`),
+                React.createElement("p", { className: "text-lg text-gray-500" }, `(${currentWord.vietnameseExample})`)
+              )
             )
-          : ( gameStage === 'word'
-              ? React.createElement(React.Fragment, null,
-                  React.createElement("p", { className: "text-4xl md:text-5xl font-semibold text-gray-900 mb-2" }, currentWord.vietnamese),
-                  currentWord.vietnameseExample ? React.createElement("p", { className: "text-xl text-gray-500 mt-2 italic" }, `"${currentWord.vietnameseExample}"`) : null
+          ) : (
+            gameStage === 'word' ? (
+              React.createElement(React.Fragment, null,
+                React.createElement("p", { className: "text-4xl md:text-5xl font-semibold text-gray-900 mb-2" }, currentWord.vietnamese),
+                currentWord.vietnameseExample && React.createElement("p", { className: "text-xl text-gray-500 mt-2 italic" }, `"${currentWord.vietnameseExample}"`)
+              )
+            ) : (
+              React.createElement(React.Fragment, null,
+                React.createElement("p", { className: "text-2xl font-semibold text-gray-800 mb-2" }, "Listen and type the sentence:"),
+                currentWord.vietnameseExample && React.createElement("p", { className: "text-2xl text-gray-700 mb-2 italic" }, `"${currentWord.vietnameseExample}"`),
+                React.createElement("p", { className: "text-lg text-gray-500" }, `(${currentWord.english} - ${currentWord.vietnamese})`)
+              )
+            )
+          ),
+          React.createElement("button", { onClick: handleListenAgain, className: "text-gray-500 hover:text-sky-500 transition-colors p-2 rounded-full active:scale-90 transform mt-2" },
+            React.createElement(SpeakerIcon)
+          )
+        ),
+        React.createElement("form", { onSubmit: handleSubmit, className: "space-y-4" },
+          React.createElement("input", {
+            ref: inputRef,
+            type: "text",
+            value: userInput,
+            onChange: (e) => setUserInput(e.target.value),
+            placeholder: gameStage === 'word' ? "Type the English word..." : "Type the English sentence...",
+            className: `w-full p-4 text-center text-lg bg-gray-100 border-2 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all duration-200 ${getInputBorderColor()}`,
+            autoCapitalize: "none",
+            autoComplete: "off",
+            autoCorrect: "off"
+          }),
+          React.createElement("button", { type: "submit", className: "w-full p-4 bg-sky-500 text-white font-bold rounded-lg hover:bg-sky-600 transition-transform hover:scale-105 transform duration-200 disabled:bg-gray-200 disabled:cursor-not-allowed disabled:scale-100" }, "Submit")
+        ),
+        React.createElement("div", { className: "mt-4 min-h-[48px] flex items-center justify-center" },
+          showHint && !feedback && (
+            React.createElement("div", { className: "relative" },
+              React.createElement("button", {
+                onMouseDown: () => setIsHintVisible(true),
+                onMouseUp: () => setIsHintVisible(false),
+                onTouchStart: () => setIsHintVisible(true),
+                onTouchEnd: () => setIsHintVisible(false),
+                className: "px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors"
+              }, "Hold for Hint"),
+              isHintVisible && (
+                React.createElement("div", { className: "absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white p-3 rounded-lg border border-gray-300 shadow-lg z-10 select-none" },
+                  React.createElement("p", { className: "text-sky-700 font-mono whitespace-nowrap" }, gameStage === 'word' ? currentWord.english : currentWord.englishExample)
                 )
-              : React.createElement(React.Fragment, null,
-                  React.createElement("p", { className: "text-2xl font-semibold text-gray-800 mb-2" }, "Listen and type the sentence:"),
-                  currentWord.vietnameseExample ? React.createElement("p", { className: "text-2xl text-gray-700 mb-2 italic" }, `"${currentWord.vietnameseExample}"`) : null,
-                  React.createElement("p", { className: "text-lg text-gray-500" }, `(${currentWord.english} - ${currentWord.vietnamese})`)
-                )
-            ),
-        React.createElement("button", { onClick: handleListenAgain, className: "text-gray-500 hover:text-sky-500 transition-colors p-2 rounded-full active:scale-90 transform mt-2" },
-          React.createElement(SpeakerIcon)
-        )
-      ),
-      React.createElement("form", { onSubmit: handleSubmit, className: "space-y-4" },
-        React.createElement("input", {
-          ref: inputRef,
-          type: "text",
-          value: userInput,
-          onChange: (e) => setUserInput(e.target.value),
-          placeholder: gameStage === 'word' ? "Type the English word..." : "Type the English sentence...",
-          className: `w-full p-4 text-center text-lg bg-gray-100 border-2 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all duration-200 ${getInputBorderColor()}`,
-          autoCapitalize: "none",
-          autoComplete: "off",
-          autoCorrect: "off"
-        }),
-        React.createElement("button", { type: "submit", className: "w-full p-4 bg-sky-500 text-white font-bold rounded-lg hover:bg-sky-600 transition-transform hover:scale-105 transform duration-200 disabled:bg-gray-200 disabled:cursor-not-allowed disabled:scale-100" }, "Submit")
-      ),
-      React.createElement("div", { className: "mt-4 min-h-[48px] flex items-center justify-center" },
-        // FIX: Replaced `&&` based conditional rendering with ternary operators (`? :`) to prevent passing boolean `false` as a React child, which causes a TypeScript error with `React.createElement`.
-        (showHint && !feedback) ? React.createElement("div", { className: "relative" },
-          React.createElement("button", {
-            onMouseDown: () => setIsHintVisible(true),
-            onMouseUp: () => setIsHintVisible(false),
-            onTouchStart: () => setIsHintVisible(true),
-            onTouchEnd: () => setIsHintVisible(false),
-            className: "px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors"
-          }, "Hold for Hint"),
-          isHintVisible ? React.createElement("div", { className: "absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white p-3 rounded-lg border border-gray-300 shadow-lg z-10 select-none" },
-            React.createElement("p", { className: "text-sky-700 font-mono whitespace-nowrap" }, gameStage === 'word' ? currentWord.english : currentWord.englishExample)
-          ) : null
-        ) : null,
-        // FIX: Replaced conditional rendering with `&&` to a ternary operator `? :` to resolve a TypeScript type inference issue. Also removed a redundant React.Fragment.
-        feedback
-          ? React.createElement(
-              "div",
-              { className: "text-center" },
-              React.createElement(
-                "p",
-                {
-                  className: `text-lg font-semibold ${
-                    feedback.type === "correct"
-                      ? "text-green-500"
-                      : "text-red-500"
-                  }`,
-                },
+              )
+            )
+          ),
+          feedback && (
+            React.createElement("div", { className: "text-center" },
+              React.createElement("p", { className: `text-lg font-semibold ${feedback.type === "correct" ? "text-green-500" : "text-red-500"}` },
                 feedback.message
               ),
-              feedback.example
-                ? React.createElement(
-                    "p",
-// FIX: The props object for this `p` element was malformed. The CSS class string was used as a property key instead of the value for the `className` property.
-                    { className: "text-lg text-gray-500 mt-1 italic" },
-                    `e.g., "${feedback.example}"`
-                  )
-                : null
+              feedback.example && React.createElement("p", { className: "text-lg text-gray-500 mt-1 italic" }, `e.g., "${feedback.example}"`)
             )
-          : null
-      )
-    ),
-    React.createElement(WrongAnswersModal, { 
-      isOpen: showWrongAnswersModal, 
-      onClose: () => setShowWrongAnswersModal(false), 
-      mistakes: wrongAnswers,
-      onPracticeMistakes: handlePracticeMistakes 
-    })
+          )
+        )
+      ),
+      React.createElement(WrongAnswersModal, { 
+        isOpen: showWrongAnswersModal, 
+        onClose: () => setShowWrongAnswersModal(false), 
+        mistakes: wrongAnswers,
+        onPracticeMistakes: handlePracticeMistakes 
+      })
+    )
   );
 };
 
-// App component and its sub-components
+// From components/WelcomeScreen.tsx
 const WelcomeScreen = ({ onNameSubmit }) => {
     const [name, setName] = useState('');
 
@@ -1392,37 +1355,106 @@ const WelcomeScreen = ({ onNameSubmit }) => {
         }
     };
 
-    return React.createElement(
-        "div",
-        { className: "flex flex-col items-center justify-center min-h-screen p-4 text-center" },
-        React.createElement(
-            "div",
-            { className: "w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 border border-gray-200" },
-            React.createElement("h1", { className: "text-4xl font-bold text-sky-600 mb-2" }, "Vocabulary Challenge"),
-            React.createElement("p", { className: "text-gray-600 mb-8" }, "Enter your name to start learning!"),
-            React.createElement(
-                "form",
-                { onSubmit: handleSubmit, className: "flex flex-col gap-4" },
-                React.createElement("input", {
-                    type: "text",
-                    value: name,
-                    onChange: (e) => setName(e.target.value),
-                    placeholder: "Your Name",
-                    className: "w-full p-4 text-center text-lg bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200",
-                    maxLength: 20
-                }),
-                React.createElement(
-                    "button",
-                    {
+    return (
+        React.createElement("div", { className: "flex flex-col items-center justify-center min-h-screen p-4 text-center" },
+            React.createElement("div", { className: "w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 border border-gray-200" },
+                React.createElement("h1", { className: "text-4xl font-bold text-sky-600 mb-2" }, "Ôn tập từ vựng GHK1 RO7"),
+                React.createElement("p", { className: "text-gray-600 mb-8" }, "Nhập tên của bạn để bắt đầu!"),
+                React.createElement("form", { onSubmit: handleSubmit, className: "flex flex-col gap-4" },
+                    React.createElement("input", {
+                        type: "text",
+                        value: name,
+                        onChange: (e) => setName(e.target.value),
+                        placeholder: "Tên của bạn",
+                        className: "w-full p-4 text-center text-lg bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200",
+                        maxLength: 20
+                    }),
+                    React.createElement("button", {
                         type: "submit",
                         disabled: !name.trim(),
                         className: "w-full p-4 bg-sky-500 text-white font-bold rounded-lg hover:bg-sky-600 transition-transform hover:scale-105 transform duration-200 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:scale-100"
-                    },
-                    "Start Learning"
+                    }, "Bắt đầu")
                 )
             )
         )
     );
+};
+
+// From components/TopicSelector.tsx
+const VoiceSelector = ({ voices, selectedVoiceURI, onVoiceChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const wrapperRef = useRef(null);
+  const selectedVoice = voices.find(v => v.voiceURI === selectedVoiceURI);
+
+  const handlePreviewVoice = (e, voice) => {
+    e.stopPropagation();
+    const utterance = new SpeechSynthesisUtterance("Hello, this is a test.");
+    utterance.voice = voice;
+    utterance.lang = voice.lang;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handleSelectVoice = (voice) => {
+    onVoiceChange(voice.voiceURI);
+    setIsOpen(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [wrapperRef]);
+  
+  if (voices.length === 0) return null;
+
+  return (
+    React.createElement("div", { className: "relative w-full max-w-xs mx-auto", ref: wrapperRef },
+      React.createElement("button", {
+        onClick: () => setIsOpen(!isOpen),
+        className: "flex items-center justify-between w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm text-left focus:outline-none focus:ring-2 focus:ring-sky-500",
+        "aria-haspopup": "listbox",
+        "aria-expanded": isOpen
+      },
+      React.createElement("span", { className: "flex items-center" },
+          React.createElement(SpeakerIcon, { className: "h-6 w-6 text-gray-500" }),
+          React.createElement("span", { className: "ml-3 truncate text-gray-700" }, selectedVoice ? selectedVoice.name : "Select a voice")
+      ),
+      React.createElement(ChevronDownIcon, { className: `h-5 w-5 text-gray-400 transition-transform duration-200 ${isOpen ? 'transform rotate-180' : ''}` })),
+
+      isOpen && (
+        React.createElement("ul", {
+          className: "absolute z-10 w-full mt-1 bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm",
+          tabIndex: -1,
+          role: "listbox"
+        },
+        voices.map((voice) => (
+          React.createElement("li", {
+            key: voice.voiceURI,
+            className: "text-gray-900 cursor-pointer select-none group",
+            role: "option",
+            "aria-selected": voice.voiceURI === selectedVoiceURI,
+            onClick: () => handleSelectVoice(voice)
+          },
+          React.createElement("div", { className: "flex items-center justify-between py-2 pl-3 pr-2 group-hover:bg-sky-100" },
+            React.createElement("span", { className: `font-normal block truncate ${voice.voiceURI === selectedVoiceURI ? 'font-semibold' : 'font-normal'}` }, `${voice.name} (${voice.lang})`),
+            React.createElement("button", { 
+              onClick: (e) => handlePreviewVoice(e, voice),
+              className: "p-1 rounded-full text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity hover:text-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-500",
+              "aria-label": `Preview voice ${voice.name}`
+            },
+              React.createElement(PlayIcon, { className: "h-5 w-5" }))
+          ))
+        )))
+      )
+    )
+  );
 };
 
 const topicColors = [
@@ -1443,36 +1475,76 @@ const topicColors = [
   'bg-green-100 border-green-300 hover:bg-green-200 text-green-800 focus:ring-green-500',
 ];
 
-const TopicSelector = ({ playerName, onSelectTopic }) => {
-  return React.createElement(
-    "div", { className: "flex flex-col items-center min-h-screen p-4" },
-    React.createElement(
-      "div", { className: "w-full max-w-6xl text-center py-8" },
-      React.createElement("h1", { className: "text-3xl md:text-4xl font-bold text-gray-800 mb-2" }, `Welcome, ${playerName}!`),
-      React.createElement("p", { className: "text-lg text-gray-600 mb-8" }, "Choose a topic to begin your challenge."),
-      React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" },
-        ...vocabularyData.map((topic, index) =>
-          React.createElement(
-            "button",
-            {
+const TopicSelector = ({ playerName, onSelectTopic, voices, selectedVoiceURI, onVoiceChange }) => {
+  return (
+    React.createElement("div", { className: "flex flex-col items-center min-h-screen p-4" },
+      React.createElement("div", { className: "w-full max-w-6xl text-center py-8" },
+        React.createElement("h1", { className: "text-3xl md:text-4xl font-bold text-gray-800 mb-2" }, `Welcome, ${playerName}!`),
+        React.createElement("p", { className: "text-lg text-gray-600 mb-6" }, "Choose a topic to begin your challenge."),
+        
+        React.createElement("div", { className: "mb-8" },
+          React.createElement(VoiceSelector, { 
+            voices: voices,
+            selectedVoiceURI: selectedVoiceURI,
+            onVoiceChange: onVoiceChange
+          })
+        ),
+
+        React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" },
+          vocabularyData.map((topic, index) => (
+            React.createElement("button", {
               key: index,
               onClick: () => onSelectTopic(topic),
               className: `p-4 rounded-lg shadow-md border hover:scale-105 transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-opacity-75 ${topicColors[index % topicColors.length]}`
             },
             React.createElement("h2", { className: "text-lg font-semibold" }, topic.title),
-// FIX: The props object was missing the `className` key, causing the class string to be interpreted as a property name. This ensures the styles are applied correctly.
-            React.createElement("p", { className: "mt-1 opacity-80" }, `${topic.words.length} words`)
-          )
+            React.createElement("p", { className: "mt-1 opacity-80" }, `${topic.words.length} words`))
+          ))
         )
       )
     )
   );
 };
 
+// From App.tsx
 const App = () => {
   const [playerName, setPlayerName] = useState(() => localStorage.getItem('playerName') || '');
   const [currentTopic, setCurrentTopic] = useState(null);
   const [topicIndex, setTopicIndex] = useState(null);
+  
+  const [voices, setVoices] = useState([]);
+  const [selectedVoiceURI, setSelectedVoiceURI] = useState(() => localStorage.getItem('selectedVoiceURI'));
+
+  useEffect(() => {
+    const loadVoices = () => {
+        const availableVoices = window.speechSynthesis.getVoices()
+            .filter(voice => voice.lang.startsWith('en-'));
+        setVoices(availableVoices);
+
+        const savedVoiceURI = localStorage.getItem('selectedVoiceURI');
+        if (savedVoiceURI && availableVoices.some(v => v.voiceURI === savedVoiceURI)) {
+            setSelectedVoiceURI(savedVoiceURI);
+        } else if (availableVoices.length > 0) {
+            const defaultVoice = availableVoices.find(v => v.lang === 'en-US') || availableVoices.find(v => v.lang === 'en-GB') || availableVoices[0];
+            if (defaultVoice) {
+                setSelectedVoiceURI(defaultVoice.voiceURI);
+                localStorage.setItem('selectedVoiceURI', defaultVoice.voiceURI);
+            }
+        }
+    };
+    
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+
+    return () => {
+        window.speechSynthesis.onvoiceschanged = null;
+    };
+  }, []);
+
+  const handleVoiceChange = useCallback((voiceURI) => {
+    setSelectedVoiceURI(voiceURI);
+    localStorage.setItem('selectedVoiceURI', voiceURI);
+  }, []);
 
   const handleNameSubmit = useCallback((name) => {
     localStorage.setItem('playerName', name);
@@ -1491,7 +1563,7 @@ const App = () => {
   }, []);
 
   const handleNextTopic = useCallback(() => {
-    if (topicIndex !== null && topicIndex !== -1 && topicIndex < vocabularyData.length - 1) {
+    if (topicIndex !== null && topicIndex >= 0 && topicIndex < vocabularyData.length - 1) {
         const nextIndex = topicIndex + 1;
         setCurrentTopic(vocabularyData[nextIndex]);
         setTopicIndex(nextIndex);
@@ -1507,7 +1579,7 @@ const App = () => {
             words: mistakes.map(mistake => mistake.word)
         };
         setCurrentTopic(practiceTopic);
-        setTopicIndex(-1); // Use -1 to denote a practice session
+        setTopicIndex(-1);
     }
   }, []);
 
@@ -1516,19 +1588,30 @@ const App = () => {
   }
 
   if (!currentTopic) {
-    return React.createElement(TopicSelector, { playerName, onSelectTopic: handleSelectTopic });
+    return (
+      React.createElement(TopicSelector, { 
+        playerName: playerName, 
+        onSelectTopic: handleSelectTopic,
+        voices: voices,
+        selectedVoiceURI: selectedVoiceURI,
+        onVoiceChange: handleVoiceChange 
+      })
+    );
   }
 
-  return React.createElement(Game, { 
+  return (
+    React.createElement(Game, { 
       key: currentTopic.title,
       topic: currentTopic, 
       onReturnToMenu: handleReturnToMenu, 
       onNextTopic: handleNextTopic,
-      onStartPractice: handleStartPractice
-  });
+      onStartPractice: handleStartPractice,
+      selectedVoiceURI: selectedVoiceURI
+    })
+  );
 };
 
-// Entry point from index.tsx
+// From index.tsx
 const rootElement = document.getElementById('root');
 if (!rootElement) {
   throw new Error("Could not find root element to mount to");
